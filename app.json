@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "shop-duytao",
+    "slug": "shop-duytao",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.voduytao.shopduytao"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.voduytao.shopduytao"
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "updates": {
+      "useClassicUpdates": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a479ceac-5ff1-46d3-8137-adaca9fc5a4b"
+      }
+    }
+  }
+}
