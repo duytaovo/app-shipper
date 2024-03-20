@@ -1,72 +1,103 @@
-import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
-  StyleProp,
+  Box,
+  Heading,
+  AspectRatio,
+  Image,
   Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native";
+  Center,
+  HStack,
+  Stack,
+  NativeBaseProvider,
+} from "native-base";
 
-import { ROUTES } from "../../../constants";
-import { ProductIProps } from "../../../types/product";
-import { formatCurrencyVietnam, formatSellNumber } from "../../../utils/common";
-import MyCustomImage from "../MyCustomImage";
-// import Sell from "../Sell";
-import styles from "./Card.style";
-
-interface IProps {
-  product: ProductIProps;
-  horizontal?: boolean;
-  border?: boolean;
-  style?: StyleProp<ViewStyle>;
-}
-
-const Card: React.FC<IProps> = ({
-  product,
-  horizontal = false,
-  border,
-  style,
-}) => {
-  const navigation = useNavigation<any>();
-
-  const handleNavigateItemScreen = () => {
-    navigation.navigate(ROUTES.product, { id: product?._id });
-  };
-
+export const CardCustom = () => {
   return (
-    <TouchableOpacity
-      onPress={() => handleNavigateItemScreen()}
-      style={[styles.wrapper(horizontal), style]}
-    >
-      <View style={styles.productWrapper(border)}>
-        <View style={styles.productSell}>
-          {/* <Sell
-            price={product?.price}
-            originalPrice={product?.original_price}
-          /> */}
-        </View>
-        <View style={styles.productImageWrapper}>
-          <MyCustomImage url={product?.images[0]} style={styles.productImage} />
-        </View>
-
-        <View style={{ padding: 10, paddingTop: 20 }}>
-          <Text numberOfLines={2} style={styles.productText}>
-            {product?.name}
+    <Box alignItems="center">
+      <Box
+        rounded="lg"
+        overflow="hidden"
+        borderColor="coolGray.200"
+        borderWidth="1"
+        _dark={{
+          borderColor: "coolGray.600",
+          backgroundColor: "gray.700",
+        }}
+        _web={{
+          shadow: 2,
+          borderWidth: 0,
+        }}
+        _light={{
+          backgroundColor: "gray.50",
+        }}
+      >
+        <Box>
+          <AspectRatio w="100%" ratio={16 / 9}>
+            <Image
+              source={{
+                uri: "https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg",
+              }}
+              alt="image"
+            />
+          </AspectRatio>
+          <Center
+            bg="violet.500"
+            _dark={{
+              bg: "violet.400",
+            }}
+            _text={{
+              color: "warmGray.50",
+              fontWeight: "700",
+              fontSize: "xs",
+            }}
+            position="absolute"
+            bottom="0"
+            px="3"
+            py="1.5"
+          >
+            PHOTOS
+          </Center>
+        </Box>
+        <Stack p="4" space={3}>
+          <Stack space={2}>
+            <Heading size="md" ml="-1">
+              The Garden City
+            </Heading>
+            <Text
+              fontSize="xs"
+              _light={{
+                color: "violet.500",
+              }}
+              _dark={{
+                color: "violet.400",
+              }}
+              fontWeight="500"
+              ml="-0.5"
+              mt="-1"
+            >
+              The Silicon Valley of India.
+            </Text>
+          </Stack>
+          <Text fontWeight="400">
+            Bengaluru (also called Bangalore) is the center of India's high-tech
+            industry. The city is also known for its parks and nightlife.
           </Text>
-
-          <View style={styles.productBottom}>
-            <Text numberOfLines={1} style={styles.productPrice}>
-              {formatCurrencyVietnam(product?.price)}
-            </Text>
-            <Text numberOfLines={1} style={styles.productSellNumber}>
-              Đã bán {formatSellNumber(product?.sell_number)}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
+          <HStack alignItems="center" space={4} justifyContent="space-between">
+            <HStack alignItems="center">
+              <Text
+                color="coolGray.600"
+                _dark={{
+                  color: "warmGray.200",
+                }}
+                fontWeight="400"
+              >
+                6 mins ago
+              </Text>
+            </HStack>
+          </HStack>
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 
-export default Card;

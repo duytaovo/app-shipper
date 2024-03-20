@@ -10,11 +10,10 @@ import {
 } from "react-native";
 
 import { ROUTES } from "../../../constants";
-import { CategoryIProps } from "../../../types/category";
 import MyCustomImage from "../../../components/shared/MyCustomImage";
 
 interface IProps {
-  data: CategoryIProps[];
+  data: any[];
 }
 const TwoRowNav: React.FC<IProps> = ({ data }) => {
   const navigation = useNavigation<any>();
@@ -23,7 +22,7 @@ const TwoRowNav: React.FC<IProps> = ({ data }) => {
     navigation.navigateToItem(ROUTES.category, { id });
   };
 
-  const renderItem = (item: CategoryIProps, index: number) => {
+  const renderItem = (item: any, index: number) => {
     return (
       <TouchableOpacity
         key={index}
@@ -49,7 +48,7 @@ const TwoRowNav: React.FC<IProps> = ({ data }) => {
         <View key={i} style={styles.column}>
           {item1 && renderItem(item1, i)}
           {item2 && renderItem(item2, i + 1)}
-        </View>
+        </View>,
       );
     }
     return items;
@@ -92,3 +91,4 @@ const styles = StyleSheet.create<any>({
   },
 });
 export default TwoRowNav;
+

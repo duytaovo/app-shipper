@@ -19,6 +19,19 @@ export const FONTS = {
 
 export const TABS = {
   home: "Home",
+  login: "Login",
+  waitForItTab: "Wait For It Tab",
+  OrderAll: "OrderAll",
+  OrderComfirmed: "OrderComfirmed",
+  OrderSuccess: "OrderSuccess",
+  OrderPending: "OrderPending",
+  OrderProcess: "OrderProcess",
+  OrderDelivered: "OrderDelivered",
+  forgotPassword: "ForgotPassword",
+  mainboard: "Mainboard",
+  WaitForDelivery: "Wait For Delivery",
+  Reject: "Reject",
+  register: "Register",
   mail: "Mail",
   live: "Live",
   notify: "Thông báo",
@@ -162,3 +175,4 @@ export const IMAGES = {
   empty: require("../assets/images/empty.png"),
 };
 export const API_URL = "https://shopee-mobile-app-clone-server.onrender.com";
+

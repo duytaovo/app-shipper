@@ -1,6 +1,8 @@
 import React from "react";
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
+
 import Swiper from "react-native-swiper/src";
+
 interface IProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
@@ -20,3 +22,4 @@ const styles = StyleSheet.create({
 });
 
 export default SwiperWrapper;
+

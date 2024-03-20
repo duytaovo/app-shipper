@@ -9,7 +9,12 @@ import { StatusBar } from "expo-status-bar";
 
 import { store } from "./src/redux/store";
 import Routes from "./src/routes";
-
+import { LinearGradient } from "expo-linear-gradient";
+const config = {
+  dependencies: {
+    "linear-gradient": LinearGradient,
+  },
+};
 const queryClient = new QueryClient();
 
 export default function App() {
@@ -17,7 +22,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <NativeBaseProvider>
+          <NativeBaseProvider config={config}>
             <NavigationContainer>
               <SafeAreaProvider style={{ flex: 1 }}>
                 <StatusBar style="auto" />
@@ -31,3 +36,4 @@ export default function App() {
     </QueryClientProvider>
   );
 }
+

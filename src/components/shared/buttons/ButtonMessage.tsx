@@ -26,3 +26,4 @@ const ButtonMessage: React.FC<IProps> = ({ color, rounded, style }) => {
 };
 
 export default ButtonMessage;
+

@@ -11,3 +11,4 @@ const getSliders = async () => {
 };
 
 export default getSliders;
+

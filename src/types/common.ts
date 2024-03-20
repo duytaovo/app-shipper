@@ -21,3 +21,4 @@ export interface DialogIProps {
   title: string;
   type: "ERROR" | "SUCCESS" | "WARNING" | "INFO";
 }
+

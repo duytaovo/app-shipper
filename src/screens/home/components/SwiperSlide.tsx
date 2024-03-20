@@ -10,11 +10,12 @@ interface IProps {
 const SwiperSlide: React.FC<IProps> = ({ data }) => {
   return (
     <SwiperWrapper>
-      {data?.map((slider, index) => (
+      {data?.map((slider: any, index) => (
         <Image
+          source={slider?.image}
           key={index}
-          source={{ uri: slider?.image }}
           style={styles.item}
+          alt="image-slider"
           accessibilityLabel={`slider-${index}`}
         />
       ))}
@@ -28,3 +29,4 @@ const styles = StyleSheet.create<any>({
   },
 });
 export default SwiperSlide;
+

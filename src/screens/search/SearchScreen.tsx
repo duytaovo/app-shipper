@@ -15,10 +15,8 @@ import HeaderWrapper from "../../components/wrapper/HeaderWrapper";
 import ScrollRefreshWrapper from "../../components/wrapper/ScrollRefreshWrapper";
 import { COLORS, ICON_BACK, ROUTES } from "../../constants";
 import { useAppSelector } from "../../hooks/useRedux";
-import getCategories from "../../services/category/getCategories";
 import SearchInput from "./components/SearchInput";
 import Error from "../../components/Error/Error";
-import searchCategoryByName from "../../services/category/searchCategoryByName";
 
 const SearchScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -30,10 +28,7 @@ const SearchScreen: React.FC = () => {
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: [`search-${JSON.stringify(name)}`],
-    queryFn: () => {
-      if (name.length > 0) return searchCategoryByName(name);
-      return getCategories();
-    },
+    queryFn: () => {},
   });
 
   if (isError) return <Error handlePress={refetch} />;
@@ -48,21 +43,6 @@ const SearchScreen: React.FC = () => {
         />
         <SearchInput />
       </HeaderWrapper>
-
-      <ScrollRefreshWrapper onRefresh={refetch} style={styles.container}>
-        {isLoading ? (
-          <ActivityIndicator size="large" />
-        ) : (
-          data?.map((category, index) => (
-            <TouchableOpacity
-              key={`category-${index}`}
-              onPress={() => handleNavigationToCategory(category._id)}
-            >
-              <Text style={styles.result}>{category.name}</Text>
-            </TouchableOpacity>
-          ))
-        )}
-      </ScrollRefreshWrapper>
     </FontWrapper>
   );
 };
@@ -85,3 +65,4 @@ const styles = StyleSheet.create<any>({
   },
 });
 export default SearchScreen;
+

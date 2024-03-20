@@ -36,7 +36,7 @@ const TabNavigation: React.FC = () => {
         }}
         component={HomeScreen}
       />
-
+      {/* 
       <Tab.Screen
         name={TABS.mail}
         options={{
@@ -91,9 +91,10 @@ const TabNavigation: React.FC = () => {
           ),
         }}
         component={PersonalScreen}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };
 
 export default TabNavigation;
+
