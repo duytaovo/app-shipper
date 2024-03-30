@@ -35,8 +35,6 @@ const PersonalScreen: React.FC = () => {
 
   const toast = useToast();
   const dispatch = useAppDispatch();
-  console.log(userWithId);
-  console.log(profile);
   const {
     control,
     handleSubmit,
@@ -44,10 +42,10 @@ const PersonalScreen: React.FC = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      fullName: userWithId.fullName,
-      email: userWithId.email,
-      phoneNumber: userWithId.phoneNumber,
-      address: userWithId.address,
+      fullName: profile.fullName,
+      email: profile.email,
+      phoneNumber: profile.phoneNumber,
+      address: profile.address,
       password: "",
       imageUrl: "",
       isEnable: true,
@@ -64,13 +62,13 @@ const PersonalScreen: React.FC = () => {
     _getData();
   }, []);
   useEffect(() => {
-    setValue("fullName", userWithId.fullName);
-    setValue("phoneNumber", userWithId.phoneNumber);
-    setValue("address", userWithId.address);
-    setValue("imageUrl", userWithId.imageUrl);
-    setValue("email", userWithId.email);
-    setValue("gender", userWithId.gender);
-  }, [userWithId, setValue]);
+    setValue("fullName", profile.fullName);
+    setValue("phoneNumber", profile.phoneNumber);
+    setValue("address", profile.address);
+    setValue("imageUrl", profile.imageUrl);
+    setValue("email", profile.email);
+    setValue("gender", profile.gender);
+  }, [profile, setValue]);
   const onSubmit = async (data: any) => {
     const body = {
       fullName: data.fullName,
@@ -84,7 +82,7 @@ const PersonalScreen: React.FC = () => {
     try {
       await setIsSubmitting(true);
       const res = await dispatch(
-        updateProfile({ id: userWithId.id, body }),
+        updateProfile({ id: profile.id, body }),
       ).then(unwrapResult);
 
       const d = res?.payload.data;
@@ -93,7 +91,7 @@ const PersonalScreen: React.FC = () => {
         title: "Update success",
         placement: "top",
       });
-      dispatch(getUserById(userWithId.id));
+      dispatch(getUserById(profile.id));
       // navigation.navigate(TABS.mainboard);
     } catch (error) {
       // if (

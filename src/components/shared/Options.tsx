@@ -2,16 +2,15 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { COLORS } from "../../constants";
-import { OptionIProps } from "../../types/product";
 
 interface IProps {
   title: string;
-  data: OptionIProps[];
+  data: any[];
   value: string;
   setValue: (value: string) => void;
 }
 const Options: React.FC<IProps> = ({ title, data, value, setValue }) => {
-  const handleSelect = (item: OptionIProps) => {
+  const handleSelect = (item: any) => {
     if (item?.enable) {
       setValue(item?.name);
     }

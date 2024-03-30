@@ -10,6 +10,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 const HomeNavigatorMainAdmin: React.FC = () => {
   console.log("admin");
+  
   return (
     <Tab.Navigator
       initialRouteName={TABS.mainboard}

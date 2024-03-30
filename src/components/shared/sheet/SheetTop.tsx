@@ -3,7 +3,6 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 
 import { COLORS, FONTS, ICON_CLOSE } from "../../../constants";
-import { formatCurrencyVietnam } from "../../../utils/common";
 import MyCustomButton from "../buttons/MyCustomButton";
 import MyCustomImage from "../MyCustomImage";
 
@@ -20,7 +19,7 @@ const SheetTop: React.FC<IProps> = ({ image, price, handleCloseSheet }) => {
         <MyCustomImage url={image} style={styles.topImage} />
       </View>
       <View style={styles.topCenter}>
-        <Text style={styles.price}>{formatCurrencyVietnam(price)}</Text>
+        {/* <Text style={styles.price}>{formatCurrencyVietnam(price)}</Text> */}
       </View>
 
       <View style={styles.topRight}>
@@ -77,3 +76,4 @@ const styles = StyleSheet.create<any>({
 });
 
 export default SheetTop;
+

@@ -12,7 +12,11 @@ interface IProps {
 const SheetButton: React.FC<IProps> = ({ title, isLoading, handlePress }) => {
   return (
     <View style={styles.buttonWrapper}>
-      <Button disabled={isLoading} style={styles.button(isLoading)} onPress={handlePress}>
+      <Button
+        disabled={isLoading}
+        style={styles.button(isLoading)}
+        onPress={handlePress}
+      >
         <Text style={styles.buttonText(isLoading)}>{title}</Text>
       </Button>
     </View>
@@ -33,3 +37,4 @@ const styles = StyleSheet.create<any>({
 });
 
 export default SheetButton;
+

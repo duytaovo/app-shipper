@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Checkbox,
@@ -22,8 +22,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { getUser, getUserById, login } from "../../redux/slice/user/userSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
-import { isAxiosUnprocessableEntityError } from "../../utils/utils";
 import { unwrapResult } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
   const [show, setShow] = useState(false);
@@ -35,7 +35,7 @@ const LoginScreen = () => {
   }, []);
 
   const toast = useToast();
-  const { profile } = useAppSelector((state) => state.user);
+  const { profile }: any = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const {
@@ -49,8 +49,10 @@ const LoginScreen = () => {
     },
   });
 
+  console.log(profile);
+
   const onSubmit = async (data: any) => {
-    // navigation.navigate("Mainboard");
+    // navigation.navigate("MainboardShipper");
     // return;
     if (data.phoneNumber === "" || data.password === "") {
       setErrorsForm({ ...errors, name: "Name is required" });
@@ -79,21 +81,23 @@ const LoginScreen = () => {
         } else {
           const res = await dispatch(getUser(""));
           await unwrapResult(res);
-          await dispatch(getUserById(res?.payload?.data.data.id));
-          console.log(profile);
-          if (profile.level === 1) {
-            toast.show({
-              title: "Login success",
-              placement: "top",
-            });
-            navigation.navigate("MainboardShipper");
-          } else {
-            toast.show({
-              title: "Login success",
-              placement: "top",
-            });
-            navigation.navigate("MainboardAdmin");
-          }
+          await dispatch(getUserById(res?.payload?.data.data.id)).then(
+            (res) => {
+              if (res?.payload?.data.data.level == 5) {
+                toast.show({
+                  title: "Login success",
+                  placement: "top",
+                });
+                navigation.navigate("MainboardAdmin");
+              } else {
+                toast.show({
+                  title: "Login success",
+                  placement: "top",
+                });
+                navigation.navigate("MainboardShipper");
+              }
+            },
+          );
         }
       } catch (error: any) {
         const formError = error.code;

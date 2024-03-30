@@ -7,16 +7,11 @@ const AppBar = ({ title }: { title: string }) => {
 
   const _goBack = () => navigation.goBack();
 
-  const _handleSearch = () => console.log("Searching");
-
-  const _handleMore = () => console.log("Shown more");
-
   return (
     <Appbar.Header>
       <Appbar.BackAction onPress={_goBack} />
       <Appbar.Content title={title} />
       {/* <Appbar.Action icon="magnify" onPress={_handleSearch} /> */}
-      <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
     </Appbar.Header>
   );
 };

@@ -1,14 +1,17 @@
 import React, { useMemo, useEffect, useState } from "react";
 import {
-  Box,
   Text,
   Pressable,
   Button,
   Input,
   Icon,
-  View,
   Toast,
+  Stack,
+  View,
   Modal,
+  Select,
+  Box,
+  CheckIcon,
 } from "native-base";
 import { ScrollView, Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -29,24 +32,31 @@ import {
   putOrderReject,
   putOrderSuccess,
 } from "../../../../redux/slice/manager/order/orderSlice";
+import useDebounce from "../../../../hooks/useDebounce";
+import { setQueries } from "../../../../redux/slice/querySlice";
 
 interface RouteParams {
   status: string;
 }
 
 const OrderAllManager = () => {
-  console.log("manager");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalReject, setShowModalReject] = useState(false);
   const [showModalReload, setShowModalReload] = useState(false);
+  const [methodSearch, setMethodSearch] = useState("");
+  const [searchValueName, setSearchValueName] = useState<string>("");
+  const [searchValueProduct, setSearchValueProduct] = useState<string>("");
+  const [searchValueAddress, setSearchValueAddress] = useState<string>("");
   const router = useRoute();
   const { status } = router.params as RouteParams;
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { orderAll } = useAppSelector((state) => state.order);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const debounce = useDebounce({ value: searchValue });
   const styles = useMemo(() => {
     return createStyles();
   }, []);
@@ -64,14 +74,17 @@ const OrderAllManager = () => {
         return "text-yellow-400 ";
     }
   };
+  const body = {
+    orderStatus: [status],
+    buyDateFrom: null,
+    buyDateTo: null,
+    paymentStatus: [],
+    productName: searchValueProduct || null,
+    customerName: searchValueName || null,
+    customerAddress: searchValueAddress || null,
+  };
 
   useEffect(() => {
-    const body = {
-      orderStatus: [status],
-      buyDateFrom: null,
-      buyDateTo: null,
-      paymentStatus: [],
-    };
     const getData = async () => {
       setIsGettingData(true);
       await dispatch(
@@ -95,12 +108,6 @@ const OrderAllManager = () => {
     const res = await dispatch(putOrderConfirm(id));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
       await dispatch(
         getOrders({
           body: body,
@@ -125,12 +132,6 @@ const OrderAllManager = () => {
     const res = await dispatch(putOrderAssign(id));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
       await dispatch(
         getOrders({
           body: body,
@@ -153,12 +154,6 @@ const OrderAllManager = () => {
     const res = await dispatch(putOrderApprove(id));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
       await dispatch(
         getOrders({
           body: body,
@@ -181,12 +176,6 @@ const OrderAllManager = () => {
     const res = await dispatch(putOrderReject(id));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
       await dispatch(
         getOrders({
           body: body,
@@ -209,12 +198,6 @@ const OrderAllManager = () => {
     const res = await dispatch(putOrderSuccess(id));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
       await dispatch(
         getOrders({
           body: body,
@@ -237,12 +220,6 @@ const OrderAllManager = () => {
     const res = await dispatch(putOrderCancel(id));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
       await dispatch(
         getOrders({
           body: body,
@@ -258,6 +235,59 @@ const OrderAllManager = () => {
       // toast.error(data.data.message);
     }
   };
+  const handleSearch = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValue(text);
+    }
+  };
+  useEffect(() => {
+    if (!debounce.trim()) {
+      dispatch(setQueries({ name: "" }));
+    } else {
+      dispatch(setQueries({ name: debounce }));
+    }
+  }, [debounce]);
+
+  const handleNavigationToSearchResult = () => {
+    const getData = async () => {
+      setIsGettingData(true);
+      await dispatch(
+        getOrders({
+          body: body,
+          params: { pageNumber: currentPage, pageSize: 100 },
+        }),
+      );
+      if (!orderAll.data.data) {
+        setIsEmptyListOrder(true);
+        setIsGettingData(false);
+      }
+      setIsGettingData(false);
+    };
+    getData();
+  };
+
+  const handleSearchValueName = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueName(text);
+    }
+  };
+  const handleSearchValueProduct = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueProduct(text);
+    }
+  };
+  const handleSearchValueAddress = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueAddress(text);
+    }
+  };
+  useEffect(() => {
+    if (!debounce.trim()) {
+      dispatch(setQueries({ name: "" }));
+    } else {
+      dispatch(setQueries({ name: debounce }));
+    }
+  }, [debounce]);
 
   const renderListWaiting = orderAll?.data?.data?.map((item, idx: number) => {
     const displayCancelBtn = item.orderStatusString != "Ordered";
@@ -574,33 +604,121 @@ const OrderAllManager = () => {
           ) : (
             <ScrollView showsVerticalScrollIndicator={false}>
               <Box style={styles.container}>
-                <Input
-                  placeholder="Search..."
-                  width="full"
-                  mb={"5"}
-                  borderRadius="4"
-                  py="3"
-                  px="1"
-                  fontSize="14"
-                  InputLeftElement={
-                    <Icon
-                      m="2"
-                      ml="3"
-                      size="6"
-                      color="gray.400"
-                      as={<MaterialIcons name="search" />}
-                    />
-                  }
-                  InputRightElement={
-                    <Icon
-                      m="2"
-                      mr="3"
-                      size="6"
-                      color="gray.400"
-                      as={<MaterialIcons name="mic" />}
-                    />
-                  }
-                />
+                <View style={styles.wrapper}>
+                  <Stack style={styles.inputWrapper}>
+                    {methodSearch === "customerName" ? (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueName}
+                        onChangeText={handleSearchValueName}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    ) : methodSearch === "customerAddress" ? (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueAddress}
+                        onChangeText={handleSearchValueAddress}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    ) : (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueProduct}
+                        onChangeText={handleSearchValueProduct}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    )}
+                    <View style={styles.input} right={5}>
+                      <Select
+                        defaultValue="customerAddress"
+                        selectedValue={methodSearch}
+                        minWidth="100"
+                        width="160"
+                        ml={2}
+                        accessibilityLabel="Chọn phương thức"
+                        placeholder="Chọn phương thức"
+                        _selectedItem={{
+                          bg: "teal.600",
+                          endIcon: <CheckIcon size="5" />,
+                        }}
+                        mt={1}
+                        onValueChange={(itemValue) =>
+                          setMethodSearch(itemValue)
+                        }
+                      >
+                        <Select.Item
+                          label="Tìm kiếm theo tên"
+                          value="customerName"
+                        />
+                        <Select.Item
+                          label="Tìm kiếm theo địa chỉ"
+                          value="customerAddress"
+                        />
+                        <Select.Item
+                          label="Tìm kiếm theo sản phẩm"
+                          value="productName"
+                        />
+                      </Select>
+                    </View>
+                  </Stack>
+                </View>
                 {renderListWaiting}
               </Box>
             </ScrollView>

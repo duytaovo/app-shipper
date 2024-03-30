@@ -154,7 +154,6 @@ export const orders = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getOrders.fulfilled, (state, { payload }) => {
-      console.log(payload.data);
       state.orderAll = payload.data;
     });
     builder.addCase(getOrderById.fulfilled, (state, { payload }) => {

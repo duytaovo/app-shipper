@@ -10,7 +10,9 @@ import ScrollRefreshWrapper from "../../../components/wrapper/ScrollRefreshWrapp
 import AppBar from "../../../components/shared/Appbar";
 import HeadingWrapper from "../../../components/wrapper/HeadingWrapper";
 import { COLORS } from "../../../constants";
+
 const MainboardAdmin: React.FC = () => {
+  console.log("admin")
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const handleScroll = (e: any) => {

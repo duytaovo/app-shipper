@@ -1,14 +1,17 @@
 import React, { useMemo, useEffect, useState, useRef } from "react";
 import {
-  Box,
   Text,
   Pressable,
   Button,
   Input,
   Icon,
-  View,
   Toast,
+  Stack,
+  View,
   Modal,
+  Select,
+  Box,
+  CheckIcon,
 } from "native-base";
 import { ScrollView, Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -27,6 +30,8 @@ import {
   putOrderReject,
   putOrderRequest,
 } from "../../../redux/slice/order/orderSlice";
+import useDebounce from "../../../hooks/useDebounce";
+import { setQueries } from "../../../redux/slice/querySlice";
 
 interface RouteParams {
   status: string;
@@ -39,15 +44,28 @@ const OrderAllShipper = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalReject, setShowModalReject] = useState(false);
   const [showModalReload, setShowModalReload] = useState(false);
-
+  const [methodSearch, setMethodSearch] = useState("");
   const router = useRoute();
   const { status } = router.params as RouteParams;
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { orderAll } = useAppSelector((state) => state.order);
+  const [searchValueName, setSearchValueName] = useState<string>("");
+  const [searchValueProduct, setSearchValueProduct] = useState<string>("");
+  const [searchValueAddress, setSearchValueAddress] = useState<string>("");
+  const debounce = useDebounce({ value: searchValueName });
   const styles = useMemo(() => {
     return createStyles();
   }, []);
+  const body = {
+    orderStatus: [status],
+    buyDateFrom: null,
+    buyDateTo: null,
+    paymentStatus: [],
+    productName: searchValueProduct || null,
+    customerName: searchValueName || null,
+    customerAddress: searchValueAddress || null,
+  };
   const style = (text: string) => {
     switch (text) {
       case "Ordered":
@@ -63,24 +81,23 @@ const OrderAllShipper = () => {
     }
   };
 
+  const _getData = async () => {
+    await dispatch(
+      getOrders({
+        body: body,
+        params: { pageNumber: currentPage, pageSize: 100 },
+      }),
+    );
+  };
+
   useEffect(() => {
-    const body = {
-      orderStatus: [status],
-      buyDateFrom: null,
-      buyDateTo: null,
-      paymentStatus: [],
-    };
     const getData = async () => {
       setIsGettingData(true);
-      await dispatch(
-        getOrders({
-          body: body,
-          params: { pageNumber: currentPage, pageSize: 100 },
-        }),
-      );
+      await _getData();
       if (!orderAll.data.data) {
         setIsEmptyListOrder(true);
-        setIsGettingData(false);
+      } else {
+        setIsEmptyListOrder(false);
       }
       setIsGettingData(false);
     };
@@ -93,19 +110,7 @@ const OrderAllShipper = () => {
     const res = await dispatch(putOrderRequest({ orderId: id }));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
-      await dispatch(
-        getOrders({
-          body: body,
-          params: { pageNumber: currentPage, pageSize: 10 },
-        }),
-      );
-
+      await _getData();
       setShowModalReload(false);
       Toast.show({ title: "Thành công", placement: "top" });
     } else {
@@ -113,7 +118,6 @@ const OrderAllShipper = () => {
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
 
       return null;
-      // toast.error(data.data.message);
     }
   };
 
@@ -123,18 +127,7 @@ const OrderAllShipper = () => {
     const res = await dispatch(putOrderReceive({ orderId: id }));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
-      await dispatch(
-        getOrders({
-          body: body,
-          params: { pageNumber: currentPage, pageSize: 10 },
-        }),
-      );
+      await _getData();
       setShowModalReload(false);
       Toast.show({ title: "Thành công", placement: "top" });
     } else {
@@ -151,18 +144,7 @@ const OrderAllShipper = () => {
     const res = await dispatch(putOrderDelivered({ orderId: id }));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
-      await dispatch(
-        getOrders({
-          body: body,
-          params: { pageNumber: currentPage, pageSize: 10 },
-        }),
-      );
+      await _getData();
       setShowModalReload(false);
       Toast.show({ title: "Thành công", placement: "top" });
     } else {
@@ -179,18 +161,7 @@ const OrderAllShipper = () => {
     const res = await dispatch(putOrderReject({ orderId: id }));
     const data = res.payload;
     if (data?.data?.code === 200) {
-      const body = {
-        orderStatus: [status],
-        buyDateFrom: null,
-        buyDateTo: null,
-        paymentStatus: [],
-      };
-      await dispatch(
-        getOrders({
-          body: body,
-          params: { pageNumber: currentPage, pageSize: 10 },
-        }),
-      );
+      await _getData();
       setShowModalReload(false);
       Toast.show({ title: "Thành công", placement: "top" });
     } else {
@@ -201,20 +172,54 @@ const OrderAllShipper = () => {
     }
   };
 
+  const handleSearchValueName = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueName(text);
+    }
+  };
+  const handleSearchValueProduct = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueProduct(text);
+    }
+  };
+  const handleSearchValueAddress = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueAddress(text);
+    }
+  };
+  useEffect(() => {
+    if (!debounce.trim()) {
+      dispatch(setQueries({ name: "" }));
+    } else {
+      dispatch(setQueries({ name: debounce }));
+    }
+  }, [debounce]);
+
+  const handleNavigationToSearchResult = () => {
+    const getData = async () => {
+      setIsGettingData(true);
+      _getData();
+      if (orderAll.data.data.length <= 0) {
+        setIsEmptyListOrder(true);
+        setIsGettingData(false);
+      }
+      setIsGettingData(false);
+    };
+    getData();
+  };
   const renderListWaiting = orderAll?.data?.data?.map((item, idx: number) => {
-    const displayCancelBtn = item.orderStatusString != "Ordered";
     const displayButtonDelivered = item.orderStatus === 6;
     return (
       <Box style={styles.listOrderItem} key={item.id}>
         <Box>
-          <Text style={tw`font-medium `}>
+          <Text style={tw`font-medium`}>
             {"Họ tên:"} <Text>{item?.nameReceiver}</Text>
           </Text>
 
           <Pressable
             onPress={() => Linking.openURL(`tel:${item.phoneReceiver}`)}
           >
-            <Text style={tw`font-medium `}>
+            <Text style={tw`font-medium`}>
               {"Điện thoại:"} <Text>{item?.phoneReceiver}</Text>
             </Text>
           </Pressable>
@@ -238,13 +243,13 @@ const OrderAllShipper = () => {
             {/* {stringStatus(item.orderStatusString)} */}
             {item.paymentStatusString === "Payment success" ? (
               <Text
-                style={tw`text-blue-500 uppercase  text-md  w-fit  rounded-lg`}
+                style={tw`text-blue-500 uppercase  text-md w-fit rounded-lg`}
               >
                 Đã thanh toán
               </Text>
             ) : (
               <Text
-                style={tw`text-blue-500 uppercase  text-md  w-fit  rounded-lg`}
+                style={tw`text-blue-500 uppercase  text-md w-fit rounded-lg`}
               >
                 Chưa thanh toán
               </Text>
@@ -425,38 +430,126 @@ const OrderAllShipper = () => {
         <LoadingComponent />
       ) : (
         <>
-          {isEmptyListOrder || !orderAll.data.data ? (
+          {isEmptyListOrder ? (
             <EmptyListOrder />
           ) : (
             <ScrollView showsVerticalScrollIndicator={false}>
               <Box style={styles.container}>
-                <Input
-                  placeholder="Search..."
-                  width="full"
-                  mb={"5"}
-                  borderRadius="4"
-                  py="3"
-                  px="1"
-                  fontSize="14"
-                  InputLeftElement={
-                    <Icon
-                      m="2"
-                      ml="3"
-                      size="6"
-                      color="gray.400"
-                      as={<MaterialIcons name="search" />}
-                    />
-                  }
-                  InputRightElement={
-                    <Icon
-                      m="2"
-                      mr="3"
-                      size="6"
-                      color="gray.400"
-                      as={<MaterialIcons name="mic" />}
-                    />
-                  }
-                />
+                <View style={styles.wrapper}>
+                  <Stack style={styles.inputWrapper}>
+                    {methodSearch === "customerName" ? (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueName}
+                        onChangeText={handleSearchValueName}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    ) : methodSearch === "customerAddress" ? (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueAddress}
+                        onChangeText={handleSearchValueAddress}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    ) : (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueProduct}
+                        onChangeText={handleSearchValueProduct}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    )}
+                    <View style={styles.input} right={5}>
+                      <Select
+                        defaultValue="customerAddress"
+                        selectedValue={methodSearch}
+                        minWidth="100"
+                        width="160"
+                        ml={2}
+                        accessibilityLabel="Chọn phương thức"
+                        placeholder="Chọn phương thức"
+                        _selectedItem={{
+                          bg: "teal.600",
+                          endIcon: <CheckIcon size="5" />,
+                        }}
+                        mt={1}
+                        onValueChange={(itemValue) =>
+                          setMethodSearch(itemValue)
+                        }
+                      >
+                        <Select.Item
+                          label="Tìm kiếm theo tên"
+                          value="customerName"
+                        />
+                        <Select.Item
+                          label="Tìm kiếm theo địa chỉ"
+                          value="customerAddress"
+                        />
+                        <Select.Item
+                          label="Tìm kiếm theo sản phẩm"
+                          value="productName"
+                        />
+                      </Select>
+                    </View>
+                  </Stack>
+                </View>
                 {renderListWaiting}
               </Box>
             </ScrollView>

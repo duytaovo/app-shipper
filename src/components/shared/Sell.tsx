@@ -13,8 +13,15 @@ const Sell: React.FC<IProps> = ({ price, originalPrice }) => {
 
   return (
     <View style={styles.productSell}>
-      <Text style={styles.productSellText}>{getPercentReduce(price, originalPrice)}%</Text>
-      <Text style={[styles.productSellText, { color: "#fff", textTransform: "uppercase" }]}>
+      <Text style={styles.productSellText}>
+        {getPercentReduce(price, originalPrice)}%
+      </Text>
+      <Text
+        style={[
+          styles.productSellText,
+          { color: "#fff", textTransform: "uppercase" },
+        ]}
+      >
         Giảm
       </Text>
 
@@ -44,3 +51,4 @@ const styles = StyleSheet.create<any>({
 });
 
 export default Sell;
+

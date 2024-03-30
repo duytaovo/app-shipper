@@ -12,6 +12,12 @@ import DetailOrderInfo from "../screens/detailOrder";
 import OrderNavigator from "./OrderNavigator";
 import HomeNavigatorMainAdmin from "./HomeNavigatorMainManager";
 import OrderNavigatorAdmin from "./manager/OrderNavigator";
+import HomeChatShipper from "../screens/Chat/HomeScreen";
+import HomeChatManager from "../screens/manager/Chat/HomeScreen";
+import ChatsScreenAdmin from "../screens/manager/Chat/ChatsScreen";
+import ChatsScreenShipper from "../screens/Chat/ChatsScreen";
+import ChatMessagesShipper from "../screens/Chat/ChatMessagesScreen";
+import ChatMessagesManager from "../screens/manager/Chat/ChatMessagesScreen";
 
 type RootStackParamList = {
   Main: any;
@@ -28,7 +34,21 @@ type RootStackParamList = {
   ValidatorCode: undefined;
   ForgotPassword: undefined;
   WaitForDelivery: undefined;
+  ShipperChat: undefined;
+  ManagerChat: undefined;
   DetailOrder: { idOrder: number | string };
+  ChatsAdmin: undefined;
+  ChatsShipper: undefined;
+  MessagesShipper: {
+    recepientId: number | string;
+    stompClient: any;
+    receiverName: string;
+  };
+  MessagesManager: {
+    recepientId: number | string;
+    stompClient: any;
+    receiverName: string;
+  };
 };
 
 declare global {
@@ -102,10 +122,18 @@ const Routes: React.FC = () => {
         component={DetailOrderInfo}
         options={{ headerShown: false }}
       />
-      {/* <Stack.Screen
-        name={"HomeNavigator"}
-        component={HomeNavigator}
-      ></Stack.Screen> */}
+      <Stack.Screen
+        name={"ShipperChat"}
+        component={HomeChatShipper}
+      ></Stack.Screen>
+      <Stack.Screen
+        name={"ManagerChat"}
+        component={HomeChatManager}
+      ></Stack.Screen>
+      <Stack.Screen name="ChatsAdmin" component={ChatsScreenAdmin} />
+      <Stack.Screen name="ChatsShipper" component={ChatsScreenShipper} />
+      <Stack.Screen name="MessagesShipper" component={ChatMessagesShipper} />
+      <Stack.Screen name="MessagesManager" component={ChatMessagesManager} />
     </Stack.Navigator>
   );
 };

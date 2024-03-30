@@ -16,6 +16,11 @@ const Select: React.FC = () => {
   const handleNavigateToOrder = () => {
     navigation.navigate("OrderAllAdmin", { status: 1 });
   };
+
+  const handleNavigateToMessage = () => {
+    navigation.navigate("ManagerChat");
+  };
+
   return (
     <FontWrapper style={tw``}>
       <HStack space={3} justifyContent="center" mb={3}>
@@ -81,7 +86,7 @@ const Select: React.FC = () => {
           }}
         >
           <IconButton
-            icon={<Icon as={MaterialIcons} name="star-rate" />}
+            icon={<Icon as={MaterialIcons} name="message" />}
             borderRadius="full"
             _icon={{
               color: "yellow.500",
@@ -101,8 +106,9 @@ const Select: React.FC = () => {
                 },
               },
             }}
+            onPress={() => handleNavigateToMessage()}
           />
-          Check Rates
+          Message
         </Box>
       </HStack>
       <HStack space={3} justifyContent="center">

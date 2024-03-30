@@ -10,7 +10,9 @@ import { Animated, StyleSheet, TouchableOpacity } from "react-native";
 import { COLORS } from "../../constants";
 import HeadingWrapper from "../../components/wrapper/HeadingWrapper";
 import CardProduct from "./components/card/Card";
-const Mainboard: React.FC = () => {
+
+const MainboardShipper: React.FC = () => {
+  console.log("shipper")
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const handleScroll = (e: any) => {
@@ -124,5 +126,5 @@ const styles = StyleSheet.create<any>({
   icon: {},
 });
 
-export default Mainboard;
+export default MainboardShipper;
 

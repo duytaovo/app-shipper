@@ -14,7 +14,7 @@ interface IProps {
 }
 const SearchInput: React.FC<IProps> = ({ placeholder = "Nhập từ khóa..." }) => {
   const dispatch = useAppDispatch();
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const [searchValue, setSearchValue] = useState<string>("");
   const debounce = useDebounce({ value: searchValue });
 
@@ -103,3 +103,4 @@ const styles = StyleSheet.create<any>({
 });
 
 export default SearchInput;
+

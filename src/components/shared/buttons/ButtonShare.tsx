@@ -9,9 +9,7 @@ interface IProps {
   style?: any;
 }
 const ButtonShare: React.FC<IProps> = ({ color, rounded, style }) => {
-  const handlePress = () => {
-    console.log("ICON_SHARE");
-  };
+  const handlePress = () => {};
 
   return (
     <MyCustomButton
@@ -25,3 +23,4 @@ const ButtonShare: React.FC<IProps> = ({ color, rounded, style }) => {
 };
 
 export default ButtonShare;
+

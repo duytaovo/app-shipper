@@ -68,3 +68,4 @@ const styles = StyleSheet.create<any>({
 });
 
 export default Quantity;
+

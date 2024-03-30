@@ -52,25 +52,25 @@ export const getCodeValidator = createAsyncThunk(
   payloadCreator(userService.sendCode),
 );
 
-const initialState = {
+interface DATA {
+  name: string;
+  accessToken: string;
+  token: string;
+  user: [];
+  permission: number;
+  isActiveEdit: boolean;
+  profile: any;
+  userWithId: any;
+}
+
+const initialState: DATA = {
   name: "admin",
   accessToken: "123",
   token: "",
   user: [],
   permission: -1,
   isActiveEdit: true,
-  profile: {
-    id: 1,
-    address: "",
-    email: "",
-    fullName: "",
-    gender: 0,
-    imageUrl: "",
-    level: 1,
-    phoneNumber: "",
-    isEnable: false,
-  },
-
+  profile: {},
   userWithId: {
     id: 1,
     fullName: "",
@@ -95,13 +95,15 @@ const userSlice = createSlice({
     //   state.accessToken = payload?.data?.data?.accessToken;
     //   state.token = payload?.data?.data?.token;
     // });
-    builder.addCase(getUser.fulfilled, (state, { payload }) => {
+    builder.addCase(getUserById.fulfilled, (state, { payload }) => {
+      console.log(payload.data.data);
       state.profile = payload.data.data;
     });
 
-    builder.addCase(getUserById.fulfilled, (state, { payload }) => {
-      state.userWithId = payload.data.data;
-    });
+    // builder.addCase(getUserById.fulfilled, (state, { payload }) => {
+    //   console.log(payload);
+    //   state.userWithId = payload.data.data;
+    // });
   },
 });
 export const { toggleActiveEdit } = userSlice.actions;
