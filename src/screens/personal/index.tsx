@@ -6,10 +6,11 @@ import {
   FormControl,
   Input,
   Button,
+  Link,
   Icon,
 } from "native-base";
 import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { BackHandler } from "react-native";
 import { StyleSheet, TouchableOpacity } from "react-native";
@@ -19,7 +20,6 @@ import HeadingWrapper from "../../components/wrapper/HeadingWrapper";
 import { Avatar, Center, Text, View } from "native-base";
 import { COLORS } from "../../constants";
 import tw from "twrnc";
-import { createStyle } from "../login/style";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
 import {
@@ -32,15 +32,10 @@ const PersonalScreen: React.FC = () => {
   const [show, setShow] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { profile, userWithId } = useAppSelector((state) => state.user);
-
+  const navigation = useNavigation();
   const toast = useToast();
   const dispatch = useAppDispatch();
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm({
+  const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
       fullName: profile.fullName,
       email: profile.email,
@@ -81,9 +76,9 @@ const PersonalScreen: React.FC = () => {
     };
     try {
       await setIsSubmitting(true);
-      const res = await dispatch(
-        updateProfile({ id: profile.id, body }),
-      ).then(unwrapResult);
+      const res = await dispatch(updateProfile({ id: profile.id, body })).then(
+        unwrapResult,
+      );
 
       const d = res?.payload.data;
       if (d?.code !== 200) return;
@@ -149,6 +144,32 @@ const PersonalScreen: React.FC = () => {
           <Text style={{ color: COLORS.primary }}>My name</Text>
         </Center>
       </View>
+      {profile.isEnable ? (
+        <Link
+          _text={{
+            fontSize: "xs",
+            fontWeight: "500",
+            color: "gray.500",
+          }}
+          alignSelf="center"
+          mt="1"
+        >
+          Tài khoản đã kích hoạt !
+        </Link>
+      ) : (
+        <Link
+          onPress={() => navigation.navigate("ValidatorActiveCode")}
+          _text={{
+            fontSize: "xs",
+            fontWeight: "500",
+            color: "indigo.500",
+          }}
+          alignSelf="center"
+          mt="1"
+        >
+          Kích hoạt tài khoản !
+        </Link>
+      )}
       <VStack space={3} mt="5" mx={2}>
         <FormControl>
           <FormControl.Label>User name</FormControl.Label>

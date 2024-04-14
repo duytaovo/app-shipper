@@ -20,7 +20,7 @@ const SearchInput: React.FC<IProps> = ({ placeholder = "Nhập từ khóa..." })
 
   const handleNavigationToSearchResult = () => {
     dispatch(setQueries({ name: searchValue }));
-    navigation.navigate(ROUTES.searchResult);
+    // navigation.navigate(ROUTES.searchResult);
   };
 
   const handleSearch = (text: string) => {

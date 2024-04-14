@@ -5,25 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../hooks/useRedux";
 import { getChatUsers, setChatByUser } from "../../../redux/slice/chat/chat";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
-// const chats = {
-//   code: 0,
-//   message: "string",
-//   data: [
-//     {
-//       id: 0,
-//       fullName: "Duy Tạo",
-//       phoneNumber: "0352811526",
-//       email: "string",
-//       gender: 0,
-//       address: "HCM",
-//       imageUrl:
-//         "https://play-lh.googleusercontent.com/bErEaJtjdDd-F2UMGe1H4Itbcl-O97a6LXN-EdDPTZgh798zBpScIymuw_o9j9kivA=w526-h296-rw",
-//       level: 1,
-//       levelString: "shipper",
-//       isEnable: true,
-//     },
-//   ],
-// };
+
 var stompClient: any = null;
 const ChatsScreenAdmin: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -76,7 +58,6 @@ const ChatsScreenAdmin: React.FC = () => {
   };
   const onPrivateMessage = (payload: any) => {
     dispatch(setChatByUser(JSON.parse(payload.body)));
-    
   };
   const connect = () => {
     let Sock = new SockJS("http://localhost:8081/ws");
@@ -85,11 +66,11 @@ const ChatsScreenAdmin: React.FC = () => {
   };
 
   useEffect(() => {
-    setUserData({ ...userData, username: "ADMIN" });
-    connect();
+    // setUserData({ ...userData, username: "ADMIN" });
+    // connect();
   }, []);
   const onError = (err: any) => {};
-  
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <Pressable>

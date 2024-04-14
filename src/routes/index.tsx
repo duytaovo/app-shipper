@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
-import MessengerScreen from "../screens/message";
 import SearchScreen from "../screens/search/SearchScreen";
 import SearchResultScreen from "../screens/search-result/SearchResultScreen";
 import TabNavigationLogin from "./TabNavigationLogin";
@@ -18,6 +17,15 @@ import ChatsScreenAdmin from "../screens/manager/Chat/ChatsScreen";
 import ChatsScreenShipper from "../screens/Chat/ChatsScreen";
 import ChatMessagesShipper from "../screens/Chat/ChatMessagesScreen";
 import ChatMessagesManager from "../screens/manager/Chat/ChatMessagesScreen";
+import ActiveAccountScreen from "../screens/Active Account";
+import ValidatorActiveScreen from "../screens/Active Account/ValidatorCode";
+import StatisticScreen from "../screens/statisticScreen";
+import BookACarMobilePage3 from "../screens/BookACarMobile/Page3";
+import BookACarMobilePage1 from "../screens/BookACarMobile/Page1";
+import BookACarMobilePage2 from "../screens/BookACarMobile/Page2";
+import MapTracking1 from "../screens/TrackingPosition/Page1";
+import MapTracking2 from "../screens/TrackingPosition/Page2";
+import MapTracking3 from "../screens/TrackingPosition/Page3";
 
 type RootStackParamList = {
   Main: any;
@@ -33,12 +41,27 @@ type RootStackParamList = {
   MainboardAdmin: undefined;
   ValidatorCode: undefined;
   ForgotPassword: undefined;
+  ValidatorActiveCode: undefined;
+  ActiveAccount: undefined;
   WaitForDelivery: undefined;
   ShipperChat: undefined;
   ManagerChat: undefined;
   DetailOrder: { idOrder: number | string };
   ChatsAdmin: undefined;
   ChatsShipper: undefined;
+  Statistic: undefined;
+  Map: undefined;
+  Map2: undefined;
+  Map3: undefined;
+  MapTracking1: {
+    address: string;
+  };
+  MapTracking2: {
+    address: string;
+  };
+  MapTracking3: {
+    address: string;
+  };
   MessagesShipper: {
     recepientId: number | string;
     stompClient: any;
@@ -67,11 +90,7 @@ const Routes: React.FC = () => {
         component={HomeScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="Messenger"
-        component={MessengerScreen}
-        options={{ title: "Tin nhắn" }}
-      />
+
       <Stack.Screen
         name="Search"
         component={SearchScreen}
@@ -95,6 +114,16 @@ const Routes: React.FC = () => {
       <Stack.Screen
         name="ForgotPassword"
         component={ForgotPassScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ValidatorActiveCode"
+        component={ValidatorActiveScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ActiveAccount"
+        component={ActiveAccountScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -122,18 +151,19 @@ const Routes: React.FC = () => {
         component={DetailOrderInfo}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name={"ShipperChat"}
-        component={HomeChatShipper}
-      ></Stack.Screen>
-      <Stack.Screen
-        name={"ManagerChat"}
-        component={HomeChatManager}
-      ></Stack.Screen>
+      <Stack.Screen name={"ShipperChat"} component={HomeChatShipper} />
+      <Stack.Screen name={"ManagerChat"} component={HomeChatManager} />
       <Stack.Screen name="ChatsAdmin" component={ChatsScreenAdmin} />
       <Stack.Screen name="ChatsShipper" component={ChatsScreenShipper} />
       <Stack.Screen name="MessagesShipper" component={ChatMessagesShipper} />
       <Stack.Screen name="MessagesManager" component={ChatMessagesManager} />
+      <Stack.Screen name="Statistic" component={StatisticScreen} />
+      <Stack.Screen name="Map" component={BookACarMobilePage1} />
+      <Stack.Screen name="Map2" component={BookACarMobilePage2} />
+      <Stack.Screen name="Map3" component={BookACarMobilePage3} />
+      <Stack.Screen name="MapTracking1" component={MapTracking1} />
+      <Stack.Screen name="MapTracking2" component={MapTracking2} />
+      <Stack.Screen name="MapTracking3" component={MapTracking3} />
     </Stack.Navigator>
   );
 };

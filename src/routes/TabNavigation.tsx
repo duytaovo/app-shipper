@@ -12,10 +12,6 @@ import {
   TABS,
 } from "../constants";
 import HomeScreen from "../screens/home/HomeScreen";
-import LiveScreen from "../screens/live/LiveScreen";
-import MailScreen from "../screens/mail";
-import NotifyScreen from "../screens/notify";
-import PersonalScreen from "../screens/personal";
 
 const Tab = createBottomTabNavigator();
 
@@ -27,7 +23,7 @@ const TabNavigation: React.FC = () => {
         options={{
           headerShown: false,
           tabBarActiveTintColor: COLORS.primary,
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }:any) => (
             <Icon
               {...ICON_HOME(focused)}
               color={focused ? COLORS.primary : COLORS.text}

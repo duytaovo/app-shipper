@@ -66,8 +66,8 @@ const ChatsScreenAdmin: React.FC = () => {
   };
 
   useEffect(() => {
-    setUserData({ ...userData, username: profile.fullName });
-    connect();
+    // setUserData({ ...userData, username: profile.fullName });
+    // connect();
   }, []);
   const onError = (err: any) => {};
   return (

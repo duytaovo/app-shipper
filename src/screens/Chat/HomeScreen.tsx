@@ -4,7 +4,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
-import { getShippers } from "../../redux/slice/managerShipper/orderSlice";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
 import { setChatByUser } from "../../redux/slice/chat/chat";

@@ -55,7 +55,7 @@ const ChatMessagesManager: React.FC = () => {
   const { chatByUser } = useAppSelector((state) => state.chatShipper);
   const { profile } = useAppSelector((state) => state.user);
   const _getData = async () => {
-    await dispatch(getChatUserById(recepientId));
+    // await dispatch(getChatUserById(recepientId));
   };
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const ChatMessagesManager: React.FC = () => {
   const sendPrivateValue = () => {
     if (stompClient) {
       if (message !== "" || selectedImage !== "") {
-        var chatMessage = {
+        const chatMessage = {
           senderId: profile.id,
           senderName: userData.username,
           receiverId: recepientId,
@@ -85,7 +85,6 @@ const ChatMessagesManager: React.FC = () => {
           status: "MESSAGE",
           attachmentUrl: selectedImage,
         };
-        console.log(chatMessage)
         dispatch(setChatByUser(chatMessage));
         stompClient.send(
           "/app/private-message",

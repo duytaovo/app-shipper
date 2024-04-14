@@ -19,7 +19,7 @@ export const FONTS = {
 
 export const TABS = {
   home: "Home",
-  login: "Login",
+  login: "LoginUser",
   waitForItTab: "Wait For It Tab",
   OrderAll: "OrderAll",
   OrderComfirmed: "OrderComfirmed",

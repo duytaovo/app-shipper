@@ -10,6 +10,7 @@ import { StatusBar } from "expo-status-bar";
 import { store } from "./src/redux/store";
 import Routes from "./src/routes";
 import { LinearGradient } from "expo-linear-gradient";
+import MyCustomDialog from "./src/components/shared/MyCustomDialog";
 const config = {
   dependencies: {
     "linear-gradient": LinearGradient,
@@ -27,7 +28,7 @@ export default function App() {
               <SafeAreaProvider style={{ flex: 1 }}>
                 <StatusBar style="auto" />
                 <Routes />
-                {/* <MyCustomDialog /> */}
+                <MyCustomDialog />
               </SafeAreaProvider>
             </NavigationContainer>
           </NativeBaseProvider>

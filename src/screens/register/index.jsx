@@ -21,7 +21,7 @@ import { useDispatch } from "react-redux";
 import { BackHandler } from "react-native";
 import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons";
 import tw from "twrnc";
-import { login, registerUser } from "../../redux/slice/user/userSlice";
+import { registerUser } from "../../redux/slice/user/userSlice";
 
 const RegisterScreen = () => {
   const [show, setShow] = useState(false);
@@ -65,7 +65,7 @@ const RegisterScreen = () => {
       const d = res?.payload.data;
       if (d?.code !== 200) return toast.error("Error");
       toast.show({
-        title: "Register success",
+        title: "Thành công",
         placement: "top",
       });
       navigation.navigate("Login");

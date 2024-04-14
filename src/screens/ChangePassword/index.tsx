@@ -21,7 +21,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { useAppDispatch } from "../../hooks/useRedux";
 import {
-  forgotPassword,
   updatePasswordUser,
 } from "../../redux/slice/user/userSlice";
 import { createStyle } from "../login/style";
@@ -80,10 +79,10 @@ const ForgotPassScreen: React.FC = () => {
         const d = res?.payload.data;
         if (d?.code !== 200) return;
         toast.show({
-          title: "Success",
+          title:"Thành công",
           placement: "top",
         });
-        navigation.navigate("Mainboard");
+        navigation.navigate("MainboardShipper");
       } catch (error) {
         if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
           const formError = error.response?.data.data;
@@ -231,7 +230,7 @@ const ForgotPassScreen: React.FC = () => {
         </Button>
       </VStack>
 
-      <Button style={tw`mt-4`} onPress={() => navigation.navigate("Mainboard")}>
+      <Button style={tw`mt-4`} onPress={() => navigation.navigate("MainboardShipper")}>
         Back
       </Button>
     </Box>

@@ -22,12 +22,18 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.voduytao.shopduytao"
+      "bundleIdentifier": "com.voduytao.shopduytao",
+      "config": {
+        "googleMapsApiKey": "REPLACE_FOR_API_KEY"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "config": {
+          "googleMapsApiKey": "REPLACE_FOR_API_KEY"
+        }
       },
       "package": "com.voduytao.shopduytao"
     },

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useRef } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import {
   Text,
   Pressable,
@@ -12,8 +12,10 @@ import {
   Select,
   Box,
   CheckIcon,
+  FlatList,
+  ScrollView,
 } from "native-base";
-import { ScrollView, Linking } from "react-native";
+import { Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { colorPalletter } from "../../../assets/theme/color";
 import LoadingComponent from "../../../components/Loading";
@@ -32,6 +34,7 @@ import {
 } from "../../../redux/slice/order/orderSlice";
 import useDebounce from "../../../hooks/useDebounce";
 import { setQueries } from "../../../redux/slice/querySlice";
+import { saveTokenToStore } from "../../../utils/storage";
 
 interface RouteParams {
   status: string;
@@ -74,10 +77,10 @@ const OrderAllShipper = () => {
         return "text-blue-400 ";
       case "Rejected":
         return "text-red-400 ";
-      // case "Success":
-      //   return "text-green-400 ";
       case "Delivered":
         return "text-yellow-400 ";
+      default:
+        return ""; // Handle default case
     }
   };
 
@@ -134,7 +137,6 @@ const OrderAllShipper = () => {
       setShowModalReload(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
       return null;
-      // toast.error(data.data.message);
     }
   };
 
@@ -151,7 +153,6 @@ const OrderAllShipper = () => {
       setShowModalReload(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
       return null;
-      // toast.error(data.data.message);
     }
   };
 
@@ -168,7 +169,6 @@ const OrderAllShipper = () => {
       setShowModalReload(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
       return null;
-      // toast.error(data.data.message);
     }
   };
 
@@ -207,40 +207,37 @@ const OrderAllShipper = () => {
     };
     getData();
   };
-  const renderListWaiting = orderAll?.data?.data?.map((item, idx: number) => {
+  const renderItem = ({ item }: { item: any }) => {
     const displayButtonDelivered = item.orderStatus === 6;
+    console.log(item.id);
     return (
-      <Box style={styles.listOrderItem} key={item.id}>
+      <Box style={styles.listOrderItem}>
         <Box>
           <Text style={tw`font-medium`}>
-            {"Họ tên:"} <Text>{item?.nameReceiver}</Text>
+            Họ tên: <Text>{item?.nameReceiver}</Text>
           </Text>
 
           <Pressable
             onPress={() => Linking.openURL(`tel:${item.phoneReceiver}`)}
           >
             <Text style={tw`font-medium`}>
-              {"Điện thoại:"} <Text>{item?.phoneReceiver}</Text>
+              Điện thoại: <Text>{item?.phoneReceiver}</Text>
             </Text>
           </Pressable>
 
-          <Text style={tw`font-medium `}>
-            {"Địa chỉ: "}
+          <Text style={tw`font-medium`}>
+            Địa chỉ:
             <Text>{item.addressReceiver}</Text>
           </Text>
-          <Text style={tw`font-medium `}>
-            {"Ngày mua: "}
+          <Text style={tw`font-medium`}>
+            Ngày mua:
             <Text>{item.buyDate.substring(0, 10)}</Text>
           </Text>
           <Text style={tw`font-medium text-red-500`}>
-            {"Tổng tiền: "}
-            <Text>
-              {item.finalPrice}
-              {"đ"}
-            </Text>
+            Tổng tiền:
+            <Text>{item.finalPrice}</Text>
           </Text>
           <View style={tw` w-fit text-blue-500`}>
-            {/* {stringStatus(item.orderStatusString)} */}
             {item.paymentStatusString === "Payment success" ? (
               <Text
                 style={tw`text-blue-500 uppercase  text-md w-fit rounded-lg`}
@@ -266,34 +263,50 @@ const OrderAllShipper = () => {
               navigation.navigate("DetailOrder", { idOrder: item.id })
             }
           >
-            Chi tiết
+            <Text style={{ color: "white" }}>Chi tiết</Text>
+          </Button>
+          <Button
+            style={{
+              backgroundColor: colorPalletter.pink["500"],
+              marginBottom: 10,
+            }}
+            onPress={() => {
+              saveTokenToStore("address", JSON.stringify(item.addressReceiver));
+              navigation.navigate("MapTracking1", {
+                address: item.addressReceiver,
+              });
+            }}
+          >
+            <Text style={{ color: "white" }}>Xem bản đồ</Text>
           </Button>
 
           {item.orderStatus === 4 ? (
-            <div>
+            <View style={{ width: "100%" }}>
               <Button
                 style={{
                   backgroundColor: colorPalletter.lime["500"],
                   marginBottom: 10,
+                  width: "100%",
                 }}
                 onPress={() => {
                   setShowModal(true);
                 }}
               >
-                Nhận đơn
+                <Text style={{ color: "white" }}>Nhận đơn</Text>
               </Button>
               <Button
                 style={{
                   backgroundColor: colorPalletter.red["500"],
                   marginBottom: 10,
+                  width: "100%",
                 }}
                 onPress={() => {
                   setShowModalReject(true);
                 }}
               >
-                Từ chối
+                <Text style={{ color: "white" }}>Từ chối</Text>
               </Button>
-            </div>
+            </View>
           ) : item.orderStatus === 5 ? (
             <Button
               style={{
@@ -304,78 +317,76 @@ const OrderAllShipper = () => {
                 setShowModal(true);
               }}
             >
-              Đã giao hàng
+              <Text style={{ color: "white" }}>Đã giao hàng</Text>
             </Button>
-          ) : (
-            item.orderStatus === 2 && (
-              <Button
-                disabled={displayButtonDelivered}
-                style={{
-                  backgroundColor: colorPalletter.yellow["500"],
-                  marginBottom: 10,
-                }}
-                onPress={() => {
-                  setShowModal(true);
-                }}
-              >
-                Yêu cầu giao
-              </Button>
-            )
-          )}
+          ) : item.orderStatus === 2 ? (
+            <Button
+              disabled={displayButtonDelivered}
+              style={{
+                backgroundColor: colorPalletter.yellow["500"],
+                marginBottom: 10,
+              }}
+              onPress={() => {
+                setShowModal(true);
+              }}
+            >
+              <Text style={{ color: "white" }}>Yêu cầu giao</Text>
+            </Button>
+          ) : null}
 
-          <Text
+          {/* <Text
             style={tw`${
-              style(item.orderStatusString) || "text-green-600 "
+              style(item.orderStatusString) || "text-green-600"
             } uppercase font-bold`}
           >
             {item.orderStatusString}
-          </Text>
+          </Text> */}
         </Box>
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <Modal.Content maxWidth="400px">
             <Modal.CloseButton />
             <Modal.Header>Bạn có chắc chắn!</Modal.Header>
             <Modal.Footer>
-              {/* <Button.Group space={2}> */}
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setShowModal(false);
-                }}
-              >
-                No
-              </Button>
-              <>
-                {item.orderStatus === 2 && (
-                  <Button
-                    onPress={() => {
-                      handleRequest(item.id);
-                    }}
-                  >
-                    Yes
-                  </Button>
-                )}{" "}
-                {item.orderStatus === 4 && (
-                  <Button
-                    onPress={() => {
-                      handleReceiced(item.id);
-                    }}
-                  >
-                    Yes
-                  </Button>
-                )}
-                {item.orderStatus === 5 && (
-                  <Button
-                    onPress={() => {
-                      handleDelivery(item.id, item);
-                    }}
-                  >
-                    Yes
-                  </Button>
-                )}
-              </>
-              {/* </Button.Group> */}
+              <Button.Group space={2}>
+                <Button
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  <Text style={{ color: "white" }}>No</Text>
+                </Button>
+                <View>
+                  {item.orderStatus === 2 ? (
+                    <Button
+                      onPress={() => {
+                        handleRequest(item.id);
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>Yes</Text>
+                    </Button>
+                  ) : null}
+                  {item.orderStatus === 4 ? (
+                    <Button
+                      onPress={() => {
+                        handleReceiced(item.id);
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>Yes</Text>
+                    </Button>
+                  ) : null}
+                  {item.orderStatus === 5 ? (
+                    <Button
+                      onPress={() => {
+                        handleDelivery(item.id, item);
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>Yes</Text>
+                    </Button>
+                  ) : null}
+                </View>
+              </Button.Group>
             </Modal.Footer>
           </Modal.Content>
         </Modal>
@@ -386,7 +397,9 @@ const OrderAllShipper = () => {
         >
           <Modal.Content maxWidth="400px">
             <Modal.CloseButton />
-            <Modal.Header>Bạn có chắc chắn !</Modal.Header>
+            <Modal.Header>
+              <Text style={{ color: "" }}>Bạn có chắc chắn !</Text>
+            </Modal.Header>
             <Modal.Footer>
               <Button.Group space={2}>
                 <Button
@@ -396,14 +409,14 @@ const OrderAllShipper = () => {
                     setShowModal(false);
                   }}
                 >
-                  No
+                  <Text style={{ color: "" }}>No</Text>
                 </Button>
                 <Button
                   onPress={() => {
                     handleReject(item.id);
                   }}
                 >
-                  Yes
+                  <Text style={{ color: "" }}>Yes</Text>
                 </Button>
               </Button.Group>
             </Modal.Footer>
@@ -414,17 +427,19 @@ const OrderAllShipper = () => {
           isOpen={showModalReload}
           onClose={() => setShowModalReload(false)}
         >
-          <Modal.Content maxWidth="100px">
-            <LoadingComponent />
+          <Modal.Content maxWidth="400px">
+            <View height={"1/2"} width={"full"}>
+              <LoadingComponent />
+              <Text>Đang xử lý ...</Text>
+            </View>
           </Modal.Content>
         </Modal>
       </Box>
     );
-  });
+  };
 
   return (
     <>
-      {/* <CardCustom /> */}
       <Appbar title="" />
       {isGettingData ? (
         <LoadingComponent />
@@ -433,126 +448,130 @@ const OrderAllShipper = () => {
           {isEmptyListOrder ? (
             <EmptyListOrder />
           ) : (
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Box style={styles.container}>
-                <View style={styles.wrapper}>
-                  <Stack style={styles.inputWrapper}>
-                    {methodSearch === "customerName" ? (
-                      <Input
-                        size="md"
-                        variant="unstyled"
-                        value={searchValueName}
-                        onChangeText={handleSearchValueName}
-                        placeholder={"Tìm kiếm..."}
-                        style={styles.input}
-                        InputRightElement={
-                          <Button
-                            variant="ghost"
-                            colorScheme="blueGray"
-                            onPress={() => {
-                              handleNavigationToSearchResult();
-                            }}
-                          >
-                            <Icon
-                              m="2"
-                              mr="3"
-                              size="6"
-                              color="gray.400"
-                              as={<MaterialIcons name="search" />}
-                            />
-                          </Button>
-                        }
-                      />
-                    ) : methodSearch === "customerAddress" ? (
-                      <Input
-                        size="md"
-                        variant="unstyled"
-                        value={searchValueAddress}
-                        onChangeText={handleSearchValueAddress}
-                        placeholder={"Tìm kiếm..."}
-                        style={styles.input}
-                        InputRightElement={
-                          <Button
-                            variant="ghost"
-                            colorScheme="blueGray"
-                            onPress={() => {
-                              handleNavigationToSearchResult();
-                            }}
-                          >
-                            <Icon
-                              m="2"
-                              mr="3"
-                              size="6"
-                              color="gray.400"
-                              as={<MaterialIcons name="search" />}
-                            />
-                          </Button>
-                        }
-                      />
-                    ) : (
-                      <Input
-                        size="md"
-                        variant="unstyled"
-                        value={searchValueProduct}
-                        onChangeText={handleSearchValueProduct}
-                        placeholder={"Tìm kiếm..."}
-                        style={styles.input}
-                        InputRightElement={
-                          <Button
-                            variant="ghost"
-                            colorScheme="blueGray"
-                            onPress={() => {
-                              handleNavigationToSearchResult();
-                            }}
-                          >
-                            <Icon
-                              m="2"
-                              mr="3"
-                              size="6"
-                              color="gray.400"
-                              as={<MaterialIcons name="search" />}
-                            />
-                          </Button>
-                        }
-                      />
-                    )}
-                    <View style={styles.input} right={5}>
-                      <Select
-                        defaultValue="customerAddress"
-                        selectedValue={methodSearch}
-                        minWidth="100"
-                        width="160"
-                        ml={2}
-                        accessibilityLabel="Chọn phương thức"
-                        placeholder="Chọn phương thức"
-                        _selectedItem={{
-                          bg: "teal.600",
-                          endIcon: <CheckIcon size="5" />,
-                        }}
-                        mt={1}
-                        onValueChange={(itemValue) =>
-                          setMethodSearch(itemValue)
-                        }
-                      >
-                        <Select.Item
-                          label="Tìm kiếm theo tên"
-                          value="customerName"
-                        />
-                        <Select.Item
-                          label="Tìm kiếm theo địa chỉ"
-                          value="customerAddress"
-                        />
-                        <Select.Item
-                          label="Tìm kiếm theo sản phẩm"
-                          value="productName"
-                        />
-                      </Select>
-                    </View>
-                  </Stack>
+            <View>
+              <Stack style={styles.wrapper}>
+                <View width={"1/2"} marginLeft={3}>
+                  {methodSearch === "customerName" ? (
+                    <Input
+                      size="md"
+                      variant="unstyled"
+                      value={searchValueName}
+                      onChangeText={handleSearchValueName}
+                      placeholder={"Tìm kiếm..."}
+                      style={styles.input}
+                      InputRightElement={
+                        <Button
+                          variant="ghost"
+                          colorScheme="blueGray"
+                          onPress={() => {
+                            handleNavigationToSearchResult();
+                          }}
+                        >
+                          <Icon
+                            m="2"
+                            mr="3"
+                            size="6"
+                            color="gray.400"
+                            as={<MaterialIcons name="search" />}
+                          />
+                        </Button>
+                      }
+                    />
+                  ) : methodSearch === "customerAddress" ? (
+                    <Input
+                      size="md"
+                      variant="unstyled"
+                      value={searchValueAddress}
+                      onChangeText={handleSearchValueAddress}
+                      placeholder={"Tìm kiếm..."}
+                      style={styles.input}
+                      InputRightElement={
+                        <Button
+                          variant="ghost"
+                          colorScheme="blueGray"
+                          onPress={() => {
+                            handleNavigationToSearchResult();
+                          }}
+                        >
+                          <Icon
+                            m="2"
+                            mr="3"
+                            size="6"
+                            color="gray.400"
+                            as={<MaterialIcons name="search" />}
+                          />
+                        </Button>
+                      }
+                    />
+                  ) : (
+                    <Input
+                      size="md"
+                      variant="unstyled"
+                      value={searchValueProduct}
+                      onChangeText={handleSearchValueProduct}
+                      placeholder={"Tìm kiếm..."}
+                      style={styles.input}
+                      InputRightElement={
+                        <Button
+                          variant="ghost"
+                          colorScheme="blueGray"
+                          onPress={() => {
+                            handleNavigationToSearchResult();
+                          }}
+                        >
+                          <Icon
+                            m="2"
+                            mr="3"
+                            size="6"
+                            color="gray.400"
+                            as={<MaterialIcons name="search" />}
+                          />
+                        </Button>
+                      }
+                    />
+                  )}
                 </View>
-                {renderListWaiting}
-              </Box>
-            </ScrollView>
+                <View width={"1/2"}>
+                  <Select
+                    background={"gray.500"}
+                    defaultValue="customerAddress"
+                    selectedValue={methodSearch}
+                    minWidth="100"
+                    width="160"
+                    ml={2}
+                    accessibilityLabel="Chọn phương thức"
+                    placeholder="Chọn phương thức"
+                    _selectedItem={{
+                      bg: "teal.600",
+                      endIcon: <CheckIcon size="5" />,
+                    }}
+                    mt={1}
+                    onValueChange={(itemValue) => setMethodSearch(itemValue)}
+                  >
+                    <Select.Item
+                      label="Tìm kiếm theo tên"
+                      value="customerName"
+                    />
+                    <Select.Item
+                      label="Tìm kiếm theo địa chỉ"
+                      value="customerAddress"
+                    />
+                    <Select.Item
+                      label="Tìm kiếm theo sản phẩm"
+                      value="productName"
+                    />
+                  </Select>
+                </View>
+              </Stack>
+              <ScrollView>
+                <FlatList
+                  data={orderAll.data.data}
+                  renderItem={renderItem}
+                  keyExtractor={(item, index) => index.toString()}
+                  showsVerticalScrollIndicator={false}
+                />
+              </ScrollView>
+            </View>
           )}
         </>
       )}

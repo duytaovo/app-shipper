@@ -16,6 +16,7 @@ export const orderService = {
     return http.put(`${URL}/delivery?orderId=${orderId}`);
   },
   putOrderReceive({ orderId }: any) {
+    console.log(orderId);
     return http.put(`${URL}/receive?orderId=${orderId}`);
   },
   putOrderReject({ orderId }: any) {

@@ -1,22 +1,17 @@
 import React, { useMemo, useState } from "react";
 import {
   Box,
-  Checkbox,
   useToast,
   Pressable,
-  Text,
   Heading,
   VStack,
   FormControl,
   Input,
-  Link,
   Button,
-  HStack,
   Icon,
 } from "native-base";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
 import { BackHandler } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import tw from "twrnc";
@@ -50,8 +45,6 @@ const ForgotPassScreen: React.FC = () => {
   });
 
   const onSubmit = async (data: any) => {
-    // navigation.navigate(TABS.mainboard);
-    // return;
     if (
       data.phoneNumber === "" ||
       data.newPassword === "" ||
@@ -77,7 +70,7 @@ const ForgotPassScreen: React.FC = () => {
         const d = res?.payload.data;
         if (d?.code !== 200) return;
         toast.show({
-          title: "Success",
+          title: "Thành công",
           placement: "top",
         });
         navigation.navigate("Login");
@@ -226,7 +219,7 @@ const ForgotPassScreen: React.FC = () => {
         </Button>
       </VStack>
 
-      <Button style={tw`mt-4`} onPress={() => navigation.navigate("Login")}>
+      <Button style={tw`mt-4`} onPress={() => navigation.goBack()}>
         Back
       </Button>
     </Box>

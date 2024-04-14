@@ -24,7 +24,9 @@ const User = ({ item, stompClient }: any) => {
             borderRadius: 25,
             resizeMode: "cover",
           }}
-          source={{ uri: item.imageUrl }}
+          source={{
+            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbUFkI2MIsn102r0Z1GLIlhnRMwHlWgpavep5qiD840A&s",
+          }}
         />
       </View>
 

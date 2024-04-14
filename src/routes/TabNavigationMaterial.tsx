@@ -11,8 +11,6 @@ import {
   TABS,
 } from "../constants";
 import HomeScreen from "../screens/home/HomeScreen";
-import LiveScreen from "../screens/live/LiveScreen";
-import MailScreen from "../screens/mail/";
 import NotifyScreen from "../screens/notify";
 import PersonalScreen from "../screens/personal";
 
@@ -30,7 +28,7 @@ const TabNavigationMaterial: React.FC = () => {
         name={TABS.home}
         options={{
           tabBarColor: COLORS.white,
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: any) => (
             <Icon
               {...ICON_HOME(focused)}
               color={focused ? COLORS.primary : COLORS.text}
@@ -41,38 +39,10 @@ const TabNavigationMaterial: React.FC = () => {
       />
 
       <Tab.Screen
-        name={TABS.mail}
-        options={{
-          tabBarColor: COLORS.white,
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              {...ICON_MAIL(focused)}
-              color={focused ? COLORS.primary : COLORS.text}
-            />
-          ),
-        }}
-        component={MailScreen}
-      />
-
-      <Tab.Screen
-        name={TABS.live}
-        options={{
-          tabBarColor: COLORS.white,
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              {...ICON_LIVE}
-              color={focused ? COLORS.primary : COLORS.text}
-            />
-          ),
-        }}
-        component={LiveScreen}
-      />
-
-      <Tab.Screen
         name={TABS.notify}
         options={{
           tabBarColor: COLORS.white,
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: any) => (
             <Icon
               {...ICON_NOTIFY(focused)}
               color={focused ? COLORS.primary : COLORS.text}
@@ -86,7 +56,7 @@ const TabNavigationMaterial: React.FC = () => {
         name={TABS.personal}
         options={{
           tabBarColor: COLORS.white,
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: any) => (
             <Icon
               {...ICON_PERSONAL(focused)}
               color={focused ? COLORS.primary : COLORS.text}
@@ -100,3 +70,4 @@ const TabNavigationMaterial: React.FC = () => {
 };
 
 export default TabNavigationMaterial;
+

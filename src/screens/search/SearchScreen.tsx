@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native";
 import MyCustomButton from "../../components/shared/buttons/MyCustomButton";
 import FontWrapper from "../../components/wrapper/FontWrapper";
 import HeaderWrapper from "../../components/wrapper/HeaderWrapper";
-import { COLORS, ICON_BACK, ROUTES } from "../../constants";
+import { COLORS, ICON_BACK } from "../../constants";
 import { useAppSelector } from "../../hooks/useRedux";
 import SearchInput from "./components/SearchInput";
 import Error from "../../components/Error/Error";

@@ -12,8 +12,10 @@ import {
   Select,
   Box,
   CheckIcon,
+  FlatList,
+  ScrollView,
 } from "native-base";
-import { ScrollView, Linking } from "react-native";
+import { Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { colorPalletter } from "../../../../assets/theme/color";
 import LoadingComponent from "../../../../components/Loading";
@@ -34,6 +36,7 @@ import {
 } from "../../../../redux/slice/manager/order/orderSlice";
 import useDebounce from "../../../../hooks/useDebounce";
 import { setQueries } from "../../../../redux/slice/querySlice";
+import { getShippers } from "../../../../redux/slice/managerShipper/orderSlice";
 
 interface RouteParams {
   status: string;
@@ -46,7 +49,9 @@ const OrderAllManager = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalReject, setShowModalReject] = useState(false);
   const [showModalReload, setShowModalReload] = useState(false);
+  const [showModalChooseShipper, setShowModalChooseShipper] = useState(false);
   const [methodSearch, setMethodSearch] = useState("");
+  const [chooseShipper, setChooseShipper] = useState("");
   const [searchValueName, setSearchValueName] = useState<string>("");
   const [searchValueProduct, setSearchValueProduct] = useState<string>("");
   const [searchValueAddress, setSearchValueAddress] = useState<string>("");
@@ -55,6 +60,8 @@ const OrderAllManager = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { orderAll } = useAppSelector((state) => state.order);
+  const { shippers } = useAppSelector((state) => state.manageShipper);
+
   const [searchValue, setSearchValue] = useState<string>("");
   const debounce = useDebounce({ value: searchValue });
   const styles = useMemo(() => {
@@ -93,6 +100,11 @@ const OrderAllManager = () => {
           params: { pageNumber: currentPage, pageSize: 100 },
         }),
       );
+      await dispatch(
+        getShippers({
+          params: { pageNumber: currentPage, pageSize: 100 },
+        }),
+      );
       if (!orderAll.data.data) {
         setIsEmptyListOrder(true);
         setIsGettingData(false);
@@ -128,8 +140,11 @@ const OrderAllManager = () => {
 
   const handleAsign = async (id: number) => {
     setShowModal(false);
+    setShowModalChooseShipper(false);
     setShowModalReload(true);
-    const res = await dispatch(putOrderAssign(id));
+    const res = await dispatch(
+      putOrderAssign({ id: id, shipperId: chooseShipper }),
+    );
     const data = res.payload;
     if (data?.data?.code === 200) {
       await dispatch(
@@ -235,11 +250,7 @@ const OrderAllManager = () => {
       // toast.error(data.data.message);
     }
   };
-  const handleSearch = (text: string) => {
-    if (!text.startsWith(" ")) {
-      setSearchValue(text);
-    }
-  };
+
   useEffect(() => {
     if (!debounce.trim()) {
       dispatch(setQueries({ name: "" }));
@@ -289,38 +300,33 @@ const OrderAllManager = () => {
     }
   }, [debounce]);
 
-  const renderListWaiting = orderAll?.data?.data?.map((item, idx: number) => {
-    const displayCancelBtn = item.orderStatusString != "Ordered";
-    const displayButtonDelivered = item.orderStatus === 6;
+  const renderItem = ({ item }: { item: any }) => {
     return (
       <Box style={styles.listOrderItem} key={item.id}>
         <Box>
           <Text style={tw`font-medium `}>
-            {"Họ tên:"} <Text>{item?.nameReceiver}</Text>
+            Họ tên: <Text>{item?.nameReceiver}</Text>
           </Text>
 
           <Pressable
             onPress={() => Linking.openURL(`tel:${item.phoneReceiver}`)}
           >
             <Text style={tw`font-medium `}>
-              {"Điện thoại:"} <Text>{item?.phoneReceiver}</Text>
+              Điện thoại: <Text>{item?.phoneReceiver}</Text>
             </Text>
           </Pressable>
 
           <Text style={tw`font-medium `}>
-            {"Địa chỉ: "}
+            Địa chỉ:
             <Text>{item.addressReceiver}</Text>
           </Text>
           <Text style={tw`font-medium `}>
-            {"Ngày mua: "}
+            Ngày mua:
             <Text>{item.buyDate.substring(0, 10)}</Text>
           </Text>
           <Text style={tw`font-medium text-red-500`}>
-            {"Tổng tiền: "}
-            <Text>
-              {item.finalPrice}
-              {"đ"}
-            </Text>
+            Tổng tiền:
+            <Text>{item.finalPrice}đ</Text>
           </Text>
           <View style={tw` w-fit text-blue-500`}>
             {/* {stringStatus(item.orderStatusString)} */}
@@ -349,34 +355,36 @@ const OrderAllManager = () => {
               navigation.navigate("DetailOrder", { idOrder: item.id })
             }
           >
-            Chi tiết
+            <Text>Chi tiết</Text>
           </Button>
 
           {item.orderStatus === 1 ? (
-            <div>
+            <View style={{ width: "100%" }}>
               <Button
                 style={{
                   backgroundColor: colorPalletter.lime["500"],
                   marginBottom: 10,
+                  width: "100%",
                 }}
                 onPress={() => {
                   setShowModal(true);
                 }}
               >
-                Xác nhận
+                <Text>Xác nhận</Text>
               </Button>
               <Button
                 style={{
                   backgroundColor: colorPalletter.red["500"],
                   marginBottom: 10,
+                  width: "100%",
                 }}
                 onPress={() => {
                   setShowModalReject(true);
                 }}
               >
-                Huỷ đơn
+                <Text>Huỷ đơn</Text>
               </Button>
-            </div>
+            </View>
           ) : item.orderStatus === 3 ? (
             <>
               <Button
@@ -388,7 +396,7 @@ const OrderAllManager = () => {
                   setShowModal(true);
                 }}
               >
-                Từ chối
+                <Text>Từ chối</Text>
               </Button>
               <Button
                 style={{
@@ -399,7 +407,7 @@ const OrderAllManager = () => {
                   setShowModal(true);
                 }}
               >
-                Giao cho shipper
+                <Text>Giao cho shipper</Text>
               </Button>
             </>
           ) : item.orderStatus === 6 ? (
@@ -413,7 +421,7 @@ const OrderAllManager = () => {
                 setShowModal(true);
               }}
             >
-              Đã giao
+              <Text>Đã giao</Text>
             </Button>
           ) : item.orderStatus === 2 ? (
             <Button
@@ -423,10 +431,10 @@ const OrderAllManager = () => {
                 marginBottom: 10,
               }}
               onPress={() => {
-                setShowModal(true);
+                setShowModalChooseShipper(true);
               }}
             >
-              Gán cho shipper
+              <Text>Gán cho shipper</Text>
             </Button>
           ) : item.orderStatus === 5 ? (
             <Button
@@ -439,7 +447,7 @@ const OrderAllManager = () => {
                 setShowModal(true);
               }}
             >
-              Đang giao hàng
+              <Text>Đang giao hàng</Text>
             </Button>
           ) : item.orderStatus === 4 ? (
             <Button
@@ -452,7 +460,7 @@ const OrderAllManager = () => {
                 setShowModal(true);
               }}
             >
-              Đã giao cho shipper
+              <Text>Đã giao cho shipper</Text>
             </Button>
           ) : (
             <Button
@@ -465,7 +473,7 @@ const OrderAllManager = () => {
                 setShowModal(true);
               }}
             >
-              Đã giao thành công
+              <Text>Đã giao thành công</Text>
             </Button>
           )}
 
@@ -477,10 +485,13 @@ const OrderAllManager = () => {
             {item.orderStatusString}
           </Text>
         </Box>
+
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <Modal.Content maxWidth="400px">
             <Modal.CloseButton />
-            <Modal.Header>Bạn có chắc chắn!</Modal.Header>
+            <Modal.Header>
+              <Text>Bạn có chắc chắn!</Text>
+            </Modal.Header>
             <Modal.Footer>
               {/* <Button.Group space={2}> */}
               <Button
@@ -490,59 +501,63 @@ const OrderAllManager = () => {
                   setShowModal(false);
                 }}
               >
-                No
+                <Text>No</Text>
               </Button>
               <>
-                {item.orderStatus === 1 && showModal && (
+                {item.orderStatus === 1 && showModal ? (
                   <Button
                     onPress={() => {
                       handleAccept(item.id);
                     }}
-                  ></Button>
-                )}{" "}
-                {item.orderStatus === 1 && showModalReject && (
+                  >
+                    <Text></Text>
+                  </Button>
+                ) : null}
+                {item.orderStatus === 1 && showModalReject ? (
                   <Button
                     onPress={() => {
                       handleCancel(item.id);
                     }}
-                  ></Button>
-                )}{" "}
-                {item.orderStatus === 3 && (
+                  >
+                    <Text></Text>
+                  </Button>
+                ) : null}
+                {item.orderStatus === 3 ? (
                   <>
                     <Button
                       onPress={() => {
                         handleReject(item.id);
                       }}
                     >
-                      Từ chối
+                      <Text>Từ chối</Text>
                     </Button>
                     <Button
                       onPress={() => {
                         handleApprove(item.id);
                       }}
                     >
-                      Giao cho shipper
+                      <Text>Giao cho shipper</Text>
                     </Button>
                   </>
-                )}{" "}
-                {item.orderStatus === 6 && (
+                ) : null}
+                {item.orderStatus === 6 ? (
                   <Button
                     onPress={() => {
                       handleAcceptSuccess(item.id);
                     }}
                   >
-                    Yes
+                    <Text>Yes</Text>
                   </Button>
-                )}
-                {item.orderStatus === 2 && (
+                ) : null}
+                {/* {item.orderStatus === 2 ? (
                   <Button
                     onPress={() => {
                       handleAsign(item.id);
                     }}
                   >
-                    Yes
+                    <Text>Yes</Text>
                   </Button>
-                )}
+                ) : null} */}
               </>
               {/* </Button.Group> */}
             </Modal.Footer>
@@ -555,7 +570,9 @@ const OrderAllManager = () => {
         >
           <Modal.Content maxWidth="400px">
             <Modal.CloseButton />
-            <Modal.Header>Bạn có chắc chắn !</Modal.Header>
+            <Modal.Header>
+              <Text>Bạn có chắc chắn !</Text>
+            </Modal.Header>
             <Modal.Footer>
               <Button.Group space={2}>
                 <Button
@@ -565,14 +582,14 @@ const OrderAllManager = () => {
                     setShowModal(false);
                   }}
                 >
-                  No
+                  <Text>No</Text>
                 </Button>
                 <Button
                   onPress={() => {
                     handleReject(item.id);
                   }}
                 >
-                  Yes
+                  <Text>Yes</Text>
                 </Button>
               </Button.Group>
             </Modal.Footer>
@@ -583,13 +600,76 @@ const OrderAllManager = () => {
           isOpen={showModalReload}
           onClose={() => setShowModalReload(false)}
         >
-          <Modal.Content maxWidth="100px">
-            <LoadingComponent />
+          <Modal.Content maxWidth="400px">
+            <View>
+              <LoadingComponent />
+              <Text>Đang xử lý ...</Text>
+            </View>
+          </Modal.Content>
+        </Modal>
+        <Modal
+          isOpen={showModalChooseShipper}
+          onClose={() => setShowModalChooseShipper(false)}
+        >
+          <Modal.Content maxWidth="400px" maxHeight={"400px"}>
+            <Modal.CloseButton />
+            <Modal.Header>
+              <Text>Chọn shipper giao hàng !</Text>
+            </Modal.Header>
+            <View width={"full"}>
+              <Select
+                background={"gray.500"}
+                defaultValue="21"
+                selectedValue={chooseShipper}
+                minWidth="20"
+                height={"60"}
+                // width="260"
+                // ml={2}
+                accessibilityLabel="Chọn Shipper"
+                placeholder="Chọn Shipper"
+                _selectedItem={{
+                  bg: "teal.600",
+                  endIcon: <CheckIcon size="5" />,
+                }}
+                mt={1}
+                onValueChange={(itemValue) => setChooseShipper(itemValue)}
+              >
+                <Select.Item label="Shipper2" value="21" />
+                {/* <Select.Item
+                  label="Tìm kiếm theo địa chỉ"
+                  value="customerAddress"
+                />
+                <Select.Item
+                  label="Tìm kiếm theo sản phẩm"
+                  value="productName"
+                /> */}
+              </Select>
+            </View>
+            <Modal.Footer>
+              <Button.Group space={2}>
+                <Button
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={() => {
+                    setShowModalChooseShipper(false);
+                  }}
+                >
+                  <Text>No</Text>
+                </Button>
+                <Button
+                  onPress={() => {
+                    handleAsign(item.id);
+                  }}
+                >
+                  <Text>Yes</Text>
+                </Button>
+              </Button.Group>
+            </Modal.Footer>
           </Modal.Content>
         </Modal>
       </Box>
     );
-  });
+  };
 
   return (
     <>
@@ -602,126 +682,130 @@ const OrderAllManager = () => {
           {isEmptyListOrder || !orderAll.data.data ? (
             <EmptyListOrder />
           ) : (
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Box style={styles.container}>
-                <View style={styles.wrapper}>
-                  <Stack style={styles.inputWrapper}>
-                    {methodSearch === "customerName" ? (
-                      <Input
-                        size="md"
-                        variant="unstyled"
-                        value={searchValueName}
-                        onChangeText={handleSearchValueName}
-                        placeholder={"Tìm kiếm..."}
-                        style={styles.input}
-                        InputRightElement={
-                          <Button
-                            variant="ghost"
-                            colorScheme="blueGray"
-                            onPress={() => {
-                              handleNavigationToSearchResult();
-                            }}
-                          >
-                            <Icon
-                              m="2"
-                              mr="3"
-                              size="6"
-                              color="gray.400"
-                              as={<MaterialIcons name="search" />}
-                            />
-                          </Button>
-                        }
-                      />
-                    ) : methodSearch === "customerAddress" ? (
-                      <Input
-                        size="md"
-                        variant="unstyled"
-                        value={searchValueAddress}
-                        onChangeText={handleSearchValueAddress}
-                        placeholder={"Tìm kiếm..."}
-                        style={styles.input}
-                        InputRightElement={
-                          <Button
-                            variant="ghost"
-                            colorScheme="blueGray"
-                            onPress={() => {
-                              handleNavigationToSearchResult();
-                            }}
-                          >
-                            <Icon
-                              m="2"
-                              mr="3"
-                              size="6"
-                              color="gray.400"
-                              as={<MaterialIcons name="search" />}
-                            />
-                          </Button>
-                        }
-                      />
-                    ) : (
-                      <Input
-                        size="md"
-                        variant="unstyled"
-                        value={searchValueProduct}
-                        onChangeText={handleSearchValueProduct}
-                        placeholder={"Tìm kiếm..."}
-                        style={styles.input}
-                        InputRightElement={
-                          <Button
-                            variant="ghost"
-                            colorScheme="blueGray"
-                            onPress={() => {
-                              handleNavigationToSearchResult();
-                            }}
-                          >
-                            <Icon
-                              m="2"
-                              mr="3"
-                              size="6"
-                              color="gray.400"
-                              as={<MaterialIcons name="search" />}
-                            />
-                          </Button>
-                        }
-                      />
-                    )}
-                    <View style={styles.input} right={5}>
-                      <Select
-                        defaultValue="customerAddress"
-                        selectedValue={methodSearch}
-                        minWidth="100"
-                        width="160"
-                        ml={2}
-                        accessibilityLabel="Chọn phương thức"
-                        placeholder="Chọn phương thức"
-                        _selectedItem={{
-                          bg: "teal.600",
-                          endIcon: <CheckIcon size="5" />,
-                        }}
-                        mt={1}
-                        onValueChange={(itemValue) =>
-                          setMethodSearch(itemValue)
-                        }
-                      >
-                        <Select.Item
-                          label="Tìm kiếm theo tên"
-                          value="customerName"
-                        />
-                        <Select.Item
-                          label="Tìm kiếm theo địa chỉ"
-                          value="customerAddress"
-                        />
-                        <Select.Item
-                          label="Tìm kiếm theo sản phẩm"
-                          value="productName"
-                        />
-                      </Select>
-                    </View>
-                  </Stack>
+            <View>
+              <Stack style={styles.wrapper}>
+                <View width={"1/2"} marginLeft={3}>
+                  {methodSearch === "customerName" ? (
+                    <Input
+                      size="md"
+                      variant="unstyled"
+                      value={searchValueName}
+                      onChangeText={handleSearchValueName}
+                      placeholder={"Tìm kiếm..."}
+                      style={styles.input}
+                      InputRightElement={
+                        <Button
+                          variant="ghost"
+                          colorScheme="blueGray"
+                          onPress={() => {
+                            handleNavigationToSearchResult();
+                          }}
+                        >
+                          <Icon
+                            m="2"
+                            mr="3"
+                            size="6"
+                            color="gray.400"
+                            as={<MaterialIcons name="search" />}
+                          />
+                        </Button>
+                      }
+                    />
+                  ) : methodSearch === "customerAddress" ? (
+                    <Input
+                      size="md"
+                      variant="unstyled"
+                      value={searchValueAddress}
+                      onChangeText={handleSearchValueAddress}
+                      placeholder={"Tìm kiếm..."}
+                      style={styles.input}
+                      InputRightElement={
+                        <Button
+                          variant="ghost"
+                          colorScheme="blueGray"
+                          onPress={() => {
+                            handleNavigationToSearchResult();
+                          }}
+                        >
+                          <Icon
+                            m="2"
+                            mr="3"
+                            size="6"
+                            color="gray.400"
+                            as={<MaterialIcons name="search" />}
+                          />
+                        </Button>
+                      }
+                    />
+                  ) : (
+                    <Input
+                      size="md"
+                      variant="unstyled"
+                      value={searchValueProduct}
+                      onChangeText={handleSearchValueProduct}
+                      placeholder={"Tìm kiếm..."}
+                      style={styles.input}
+                      InputRightElement={
+                        <Button
+                          variant="ghost"
+                          colorScheme="blueGray"
+                          onPress={() => {
+                            handleNavigationToSearchResult();
+                          }}
+                        >
+                          <Icon
+                            m="2"
+                            mr="3"
+                            size="6"
+                            color="gray.400"
+                            as={<MaterialIcons name="search" />}
+                          />
+                        </Button>
+                      }
+                    />
+                  )}
                 </View>
-                {renderListWaiting}
-              </Box>
-            </ScrollView>
+                <View width={"1/2"}>
+                  <Select
+                    background={"gray.500"}
+                    defaultValue="customerAddress"
+                    selectedValue={methodSearch}
+                    minWidth="100"
+                    width="160"
+                    ml={2}
+                    accessibilityLabel="Chọn phương thức"
+                    placeholder="Chọn phương thức"
+                    _selectedItem={{
+                      bg: "teal.600",
+                      endIcon: <CheckIcon size="5" />,
+                    }}
+                    mt={1}
+                    onValueChange={(itemValue) => setMethodSearch(itemValue)}
+                  >
+                    <Select.Item
+                      label="Tìm kiếm theo tên"
+                      value="customerName"
+                    />
+                    <Select.Item
+                      label="Tìm kiếm theo địa chỉ"
+                      value="customerAddress"
+                    />
+                    <Select.Item
+                      label="Tìm kiếm theo sản phẩm"
+                      value="productName"
+                    />
+                  </Select>
+                </View>
+              </Stack>
+              <ScrollView>
+                <FlatList
+                  data={orderAll.data.data}
+                  renderItem={renderItem}
+                  keyExtractor={(item, index) => index.toString()}
+                  showsVerticalScrollIndicator={false}
+                />
+              </ScrollView>
+            </View>
           )}
         </>
       )}

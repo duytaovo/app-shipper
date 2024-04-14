@@ -16,7 +16,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { createStyle } from "../../login/style";
 import { getCodeValidator } from "../../../redux/slice/user/userSlice";
 import { useAppDispatch } from "../../../hooks/useRedux";
-import { ROUTES } from "../../../constants";
 import tailwind from "twrnc";
 import { unwrapResult } from "@reduxjs/toolkit";
 
@@ -65,7 +64,7 @@ const ValidatorScreen: React.FC = () => {
         console.log(d);
         if (d?.code !== 200) return;
         toast.show({
-          title: "Success",
+          title: "Thành công",
           placement: "top",
         });
         navigation.navigate("ForgotPassword");
@@ -182,7 +181,7 @@ const ValidatorScreen: React.FC = () => {
         </Button>
       </VStack>
 
-      <Button style={tailwind`mt-4`} onPress={() => navigation.navigate("Login")}>
+      <Button style={tailwind`mt-4`} onPress={() => navigation.goBack()}>
         Back
       </Button>
     </Box>

@@ -39,7 +39,7 @@ export function createStyles() {
       fontWeight: "bold",
     },
     wrapper: {
-      flex: 1,
+      // flex: 1,
       flexDirection: "row",
       alignItems: "center",
     },

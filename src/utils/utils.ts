@@ -78,3 +78,75 @@ export function formatNumberToSocialStyle(value: number) {
     .toLowerCase();
 }
 
+export const convertAddressToCommonFormat = (addressData: any) => {
+  if (addressData && addressData.geometry) {
+    // Nếu có dữ liệu hình học, sử dụng nó để xác định tọa độ
+    const { coordinates } = addressData.geometry;
+    return {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: coordinates.reverse(), // Lưu ý: leaflet sử dụng [lat, lng]
+      },
+      properties: {
+        layer: "venue",
+        name: addressData.properties.name || "",
+        distance: addressData.properties.distance || null,
+        accuracy: "point",
+        region: addressData.properties.region || "",
+        region_gid: addressData.properties.region_gid || "",
+        county: addressData.properties.county || "",
+        county_gid: addressData.properties.county_gid || "",
+        locality: addressData.properties.locality || "",
+        locality_gid: addressData.properties.locality_gid || "",
+        label: addressData.properties.label || "",
+        address: addressData.properties.addendum?.address || "",
+        addendum: addressData.properties.addendum || null,
+        block: null,
+        floor: null,
+      },
+      bbox: [
+        coordinates[1], // Tọa độ lat
+        coordinates[0], // Tọa độ lng
+        coordinates[1], // Tọa độ lat
+        coordinates[0], // Tọa độ lng
+      ],
+      Id: addressData.Id || null,
+    };
+  } else if (addressData && addressData.lat && addressData.lng) {
+    // Nếu chỉ có tọa độ lat và lng, sử dụng chúng
+    return {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [addressData.lng, addressData.lat], // Lưu ý: leaflet sử dụng [lng, lat]
+      },
+      properties: {
+        layer: "venue",
+        name: addressData.name || "",
+        distance: addressData.distance || null,
+        accuracy: "point",
+        region: addressData.address || "",
+        region_gid: null,
+        county: null,
+        county_gid: null,
+        locality: null,
+        locality_gid: null,
+        label: addressData.display || "",
+        address: null,
+        addendum: null,
+        block: null,
+        floor: null,
+      },
+      bbox: [
+        addressData.lng,
+        addressData.lat,
+        addressData.lng,
+        addressData.lat,
+      ],
+      Id: null,
+    };
+  } else {
+    return null;
+  }
+};

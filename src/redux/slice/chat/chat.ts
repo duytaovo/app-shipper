@@ -12,6 +12,16 @@ export const getChatUserById = createAsyncThunk(
   payloadCreator(chatService.getChatUserById),
 );
 
+export const uploadImage = createAsyncThunk(
+  "chat/uploadImage",
+  payloadCreator(chatService.uploadImage),
+);
+
+export const uploadManyImages = createAsyncThunk(
+  "chat/uploadManyImages",
+  payloadCreator(chatService.uploadManyImages),
+);
+
 const initialState = {
   chats: {
     code: 0,

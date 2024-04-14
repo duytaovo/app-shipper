@@ -18,8 +18,9 @@ import EmojiSelector from "react-native-emoji-selector";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
-import { getChatUserById, setChatByUser } from "../../redux/slice/chat/chat";
+import { setChatByUser, uploadImage } from "../../redux/slice/chat/chat";
 import { formatTimeChat } from "../../utils/format-time";
+import { unwrapResult } from "@reduxjs/toolkit";
 interface Message {
   code: number;
   message: string;
@@ -42,7 +43,7 @@ const ChatMessagesShipper: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState(null || "");
   const [message, setMessage] = useState(null || "");
   const route = useRoute();
-  const {receiverName, recepientId, stompClient }: any = route.params;
+  const { receiverName, recepientId, stompClient }: any = route.params;
   const scrollViewRef: any = useRef(null);
   const [userData, setUserData] = useState({
     username: "",
@@ -58,8 +59,8 @@ const ChatMessagesShipper: React.FC = () => {
   const { profile } = useAppSelector((state) => state.user);
   console.log(profile);
   console.log(chatByUser);
-  const _getData =  () => {
-    dispatch(getChatUserById(recepientId));
+  const _getData = () => {
+    // dispatch(getChatUserById(recepientId));
   };
 
   useEffect(() => {
@@ -76,8 +77,28 @@ const ChatMessagesShipper: React.FC = () => {
     getData();
   }, [dispatch]);
 
-  const sendPrivateValue = () => {
+  const sendPrivateValue = async () => {
     if (stompClient) {
+      let imageUrl = null;
+      if (selectedImage) {
+        let localUri = selectedImage;
+        let filename: any = localUri.split("/").pop();
+
+        let match = /\.(\w+)$/.exec(filename);
+        let form = new FormData();
+        const response1: any = await fetch(localUri as string);
+        const blob = await response1.blob();
+        // Assume "photo" is the name of the form field the server expects
+        form.append(
+          "file",
+          // JSON.parse(JSON.stringify({ uri: localUri, name: filename!, type })),
+          blob,
+        );
+        const response = await dispatch(uploadImage(form));
+        unwrapResult(response);
+        imageUrl = response.payload?.data?.data;
+      }
+
       if (message !== "" || selectedImage !== "") {
         var chatMessage = {
           senderId: profile.id,
@@ -89,7 +110,6 @@ const ChatMessagesShipper: React.FC = () => {
           status: "MESSAGE",
           attachmentUrl: selectedImage,
         };
-        console.log(chatMessage)
         dispatch(setChatByUser(chatMessage));
         stompClient.send(
           "/app/private-message",
@@ -132,6 +152,7 @@ const ChatMessagesShipper: React.FC = () => {
       quality: 1,
     });
 
+    console.log("result" + JSON.stringify(result));
     if (!result.canceled) {
       setSelectedImage(result?.assets[0]?.uri);
     }
@@ -250,7 +271,7 @@ const ChatMessagesShipper: React.FC = () => {
           }
 
           if (item?.attachmentUrl?.length > 5) {
-            const imageUrl = item.attachmentUrl;
+            const imageUrl = item?.attachmentUrl;
             const source = { uri: imageUrl };
             return (
               <Pressable

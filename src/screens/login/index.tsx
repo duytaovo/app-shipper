@@ -23,7 +23,6 @@ import tw from "twrnc";
 import { getUser, getUserById, login } from "../../redux/slice/user/userSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
 import { unwrapResult } from "@reduxjs/toolkit";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
   const [show, setShow] = useState(false);
@@ -48,8 +47,6 @@ const LoginScreen = () => {
       password: "",
     },
   });
-
-  console.log(profile);
 
   const onSubmit = async (data: any) => {
     // navigation.navigate("MainboardShipper");

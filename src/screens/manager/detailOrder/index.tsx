@@ -372,11 +372,13 @@ const DetailOrderInfo: React.FC = () => {
                         ? "Giao cho shipper"
                         : orderDetail.orderStatus === 6
                         ? "Đã giao"
-                        : orderDetail.orderStatus === 2 && "Gán cho shipper"}
+                        : orderDetail.orderStatus === 2
+                        ? "Gán cho shipper"
+                        : null}
                     </Text>
                   </Box>
                 </Pressable>
-                {orderDetail.orderStatus === 2 && (
+                {orderDetail.orderStatus === 2 ? (
                   <Pressable
                     style={styles.btnInner2}
                     onPress={() => handleReject(idOrder)}
@@ -388,7 +390,7 @@ const DetailOrderInfo: React.FC = () => {
                       </Text>
                     </Box>
                   </Pressable>
-                )}
+                ) : null}
               </Box>
             </Box>
           </ScrollView>

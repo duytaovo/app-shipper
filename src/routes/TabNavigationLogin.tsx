@@ -2,15 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { Icon } from "@rneui/themed";
 import React from "react";
-import {
-  COLORS,
-  ICON_HOME,
-  ICON_LIVE,
-  ICON_MAIL,
-  ICON_NOTIFY,
-  ICON_PERSONAL,
-  TABS,
-} from "../constants";
+import { COLORS, ICON_HOME, ICON_MAIL, TABS } from "../constants";
 import LoginScreen from "../screens/login";
 import RegisterScreen from "../screens/register";
 

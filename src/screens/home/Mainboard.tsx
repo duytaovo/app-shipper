@@ -12,7 +12,7 @@ import HeadingWrapper from "../../components/wrapper/HeadingWrapper";
 import CardProduct from "./components/card/Card";
 
 const MainboardShipper: React.FC = () => {
-  console.log("shipper")
+  console.log("shipper");
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const handleScroll = (e: any) => {

@@ -74,7 +74,6 @@ const DetailOrderInfo: React.FC = () => {
       // );
     } else {
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
-
       return null;
       // toast.error(data.data.message);
     }
@@ -178,30 +177,6 @@ const DetailOrderInfo: React.FC = () => {
       // dispatch(listOrderActions.setIsReloadGettingDataCG(true));
     }, 100);
   };
-  // const handleAddInClick = (orderCode: number | string) => {
-  //   addOrderInfo({ order: orderCode, code: userCode })
-  //     .then((res) => {
-  //       toast.show({
-  //         baseStyle: {
-  //           display: "flex",
-  //           flexWrap: "wrap",
-  //           fontSize: 11,
-  //         },
-  //         title: res.ok ? "Thêm thành công" : "Thêm thất bại",
-  //         status: res.ok ? "success" : "error",
-  //         placement: "top",
-  //         isClosable: true,
-  //       });
-  //       setIsDisableAddInButton(true);
-  //       setTimeout(() => {
-  //         navigation.goBack();
-  //         dispatch(listOrderActions.setIsReloadGettingDataCG(true));
-  //       }, 100);
-  //     })
-  //     .catch((err) => {
-  //       alert(err);
-  //     });
-  // };
 
   return (
     <>
@@ -249,15 +224,6 @@ const DetailOrderInfo: React.FC = () => {
               </View>
             </Box>
             <Box style={styles.guestInfoSection}>
-              {/* <Box style={styles.sellerInfoSecction}>
-              <Text style={styles.sellerInfoTitleInner}>
-                {"Người bán: "}
-                <Text>{orderDetail?.nameShop}</Text>
-              </Text>
-              <Text style={styles.sellerPhoneNumberInner}>
-                {orderDetail?.phoneShop}
-              </Text>
-            </Box> */}
               <Pressable
                 onPress={() =>
                   Linking.openURL(`tel:${orderDetail?.phoneReceiver}`)
@@ -319,32 +285,31 @@ const DetailOrderInfo: React.FC = () => {
               <Box style={styles.btnGroupInner}>
                 <Pressable
                   style={styles.btnInner1}
-                  onPress={() => handleAccept(idOrder)}
+                  onPress={() => setShowModal(true)}
                   disabled={isDisableAddInButton}
                 >
                   <Box style={styles.btnTextTitle}>
                     <Text style={styles.btnTextTitleInner}>
                       {orderDetail.orderStatus === 2
                         ? "Nhận đơn"
-                        : orderDetail.orderStatus === 3
+                        : orderDetail.orderStatus === 4
                         ? "Giao hàng"
-                        : "Đã giao"}
+                        : orderDetail.orderStatus === 5
+                        ? "Đã giao"
+                        : null}
                     </Text>
                   </Box>
                 </Pressable>
-                {orderDetail.orderStatus === 2 && (
+                {orderDetail.orderStatus === 2 ? (
                   <Pressable
                     style={styles.btnInner2}
                     onPress={() => handleReject(idOrder)}
                   >
                     <Box style={styles.btnTextTitle}>
-                      <Text style={styles.btnTextTitleInner}>
-                        {/* {orderDetail.orderStatusString} */}
-                        Từ chối
-                      </Text>
+                      <Text style={styles.btnTextTitleInner}>Từ chối</Text>
                     </Box>
                   </Pressable>
-                )}
+                ) : null}
               </Box>
             </Box>
           </ScrollView>
