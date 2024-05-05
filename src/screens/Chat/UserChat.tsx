@@ -21,16 +21,6 @@ interface Props {
   stompClient: any;
 }
 
-interface Message {
-  senderId: number;
-  senderName: string;
-  receiverId: number;
-  receiverName: string;
-  message: string;
-  date: string;
-  status: string;
-}
-
 const UserChat: React.FC<Props> = ({ item, stompClient }) => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -38,7 +28,7 @@ const UserChat: React.FC<Props> = ({ item, stompClient }) => {
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
   const { chatByUser } = useAppSelector((state) => state.chatShipper);
   const _getData = () => {
-    dispatch(getChatUserById(item.id));
+    // dispatch(getChatUserById(item.id));
   };
 
   useEffect(() => {
@@ -91,7 +81,7 @@ const UserChat: React.FC<Props> = ({ item, stompClient }) => {
 
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 15, fontWeight: "500" }}>
-          {item?.fullName}
+          {item?.fullName || "Admin"}
         </Text>
         {lastMessage && (
           <Text style={{ marginTop: 3, color: "gray", fontWeight: "500" }}>

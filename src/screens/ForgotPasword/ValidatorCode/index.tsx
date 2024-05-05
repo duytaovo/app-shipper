@@ -18,6 +18,7 @@ import { getCodeValidator } from "../../../redux/slice/user/userSlice";
 import { useAppDispatch } from "../../../hooks/useRedux";
 import tailwind from "twrnc";
 import { unwrapResult } from "@reduxjs/toolkit";
+import AppBar from "../../../components/shared/Appbar";
 
 const ValidatorScreen: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,6 +100,7 @@ const ValidatorScreen: React.FC = () => {
 
   return (
     <Box style={styles.container}>
+      <AppBar title="Quên mật khẩu" />
       <Heading
         size="lg"
         fontWeight="600"
@@ -107,22 +109,12 @@ const ValidatorScreen: React.FC = () => {
           color: "warmGray.50",
         }}
       >
-        Welcome
+        Xin chào
       </Heading>
-      <Heading
-        mt="1"
-        _dark={{
-          color: "warmGray.200",
-        }}
-        color="coolGray.600"
-        fontWeight="medium"
-        size="xs"
-      >
-        Validator code!
-      </Heading>
+    
       <VStack space={3} mt="5">
         <FormControl>
-          <FormControl.Label>Phone Number</FormControl.Label>
+          <FormControl.Label>Số điện thoại</FormControl.Label>
           <Controller
             control={control}
             name="phoneNumber"
@@ -181,9 +173,7 @@ const ValidatorScreen: React.FC = () => {
         </Button>
       </VStack>
 
-      <Button style={tailwind`mt-4`} onPress={() => navigation.goBack()}>
-        Back
-      </Button>
+      
     </Box>
   );
 };

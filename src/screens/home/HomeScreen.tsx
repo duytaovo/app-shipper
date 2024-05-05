@@ -66,10 +66,10 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
       <Text
         style={tw` text-center flex inset-0 justify-center align-top m-8 pt-10 text-3xl font-bold`}
       >
-        The best app for shipping & delivery in this century
+       Ứng dụng tốt nhất để vận chuyển và giao hàng 
       </Text>
       <Button style={tw`m-4 `} onPress={() => navigation.navigate("Login")}>
-        Next
+        Tiếp
       </Button>
     </FontWrapper>
   );

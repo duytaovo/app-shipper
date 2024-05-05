@@ -7,7 +7,7 @@ export function createStyles() {
   return StyleSheet.create({
     box: {
       backgroundColor: "white",
-      width: WINDOW_WIDTH * 0.27,
+      width: WINDOW_WIDTH * 0.29,
       height: WINDOW_WIDTH * 0.39,
       borderRadius: 15,
       paddingLeft: 8,

@@ -63,7 +63,7 @@ const RegisterScreen = () => {
       const res = await dispatch(registerUser(body));
       // unwrapResult(res);
       const d = res?.payload.data;
-      if (d?.code !== 200) return toast.error("Error");
+      if (d == undefined) return toast.error("Email hoặc số điện thoại đã đăng ký .");
       toast.show({
         title: "Thành công",
         placement: "top",
@@ -107,7 +107,7 @@ const RegisterScreen = () => {
           color: "warmGray.50",
         }}
       >
-        Welcome
+        Xin chào
       </Heading>
       <Heading
         mt="1"
@@ -118,11 +118,11 @@ const RegisterScreen = () => {
         fontWeight="medium"
         size="xs"
       >
-        Sign up to continue!
+        Đăng ký để tiếp tục!
       </Heading>
       <VStack space={3} mt="5">
         <FormControl>
-          <FormControl.Label>User name</FormControl.Label>
+          <FormControl.Label>Tên</FormControl.Label>
           <Controller
             control={control}
             name="fullName"
@@ -146,7 +146,7 @@ const RegisterScreen = () => {
           />
         </FormControl>
         <FormControl>
-          <FormControl.Label>Password</FormControl.Label>
+          <FormControl.Label>Mật khẩu</FormControl.Label>
           <Controller
             control={control}
             name="password"
@@ -201,7 +201,7 @@ const RegisterScreen = () => {
             />
           </FormControl>
           <FormControl>
-            <FormControl.Label>Phone</FormControl.Label>
+            <FormControl.Label>Số điện thoại</FormControl.Label>
             <Controller
               control={control}
               name="phone"
@@ -225,7 +225,7 @@ const RegisterScreen = () => {
             />
           </FormControl>
           <FormControl>
-            <FormControl.Label>Address</FormControl.Label>
+            <FormControl.Label>Địa chỉ</FormControl.Label>
             <Controller
               control={control}
               name="address"
@@ -257,33 +257,13 @@ const RegisterScreen = () => {
           isLoadingText="Submitting"
           onPress={handleSubmit(onSubmit)}
         >
-          Sign up
+          Đăng ký
         </Button>
-        <HStack mt="6" justifyContent="center">
-          <Text
-            fontSize="sm"
-            color="coolGray.600"
-            _dark={{
-              color: "warmGray.200",
-            }}
-          >
-            I'm had account.{" "}
-          </Text>
-          {/* <Link
-            _text={{
-              color: "indigo.500",
-              fontWeight: "medium",
-              fontSize: "sm",
-            }}
-            onPress={() => navigation.navigate("Login")}
-          >
-            Sign in
-          </Link> */}
-        </HStack>
+       
       </VStack>
 
       <Button style={tw`mt-4`} onPress={() => navigation.navigate("Home")}>
-        Back
+        Trở lại
       </Button>
     </Box>
   );

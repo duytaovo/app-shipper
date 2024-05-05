@@ -1,49 +1,34 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { payloadCreator } from "../../../utils/utils";
-import { chatService } from "../../../services/chat.service";
+import statisticApi from "../../../services/statistic/statistic.api";
 
-export const getChatUsers = createAsyncThunk(
-  "chat/getChatUsers",
-  payloadCreator(chatService.getChatUsers),
+export const getStatistic = createAsyncThunk(
+  "statistic/getStatistic",
+  payloadCreator(statisticApi.getStatic),
 );
 
-const initialState = {
-  statistic: {
-    // Tổng thu nhập của ngày/tuần/tháng/năm này
-    totalOrderReceived: {
-      today: 25,
-      week: 100,
-      month: 500,
-      year: 500,
-    },
-    // Tổng thu nhập của ngày/tuần/tháng/năm này
-    totalOrderDelivered: {
-      today: 25,
-      week: 100,
-      month: 500,
-      year: 500,
-    },
-    // Tổng thu nhập của ngày/tuần/tháng/năm này
-    totalIncome: {
-      today: 250000,
-      week: 1000000,
-      month: 5000000,
-      year: 500,
-    },
-    // Thu nhập từng tháng trong năm
-    income12Month: [
-      { name: 2022, data: [12, 14, 2, 47, 42, 15, 47, 75, 65, 19, 14, 22] },
-      { name: 2023, data: [12, 14, 2, 47, 42, 15, 47, 75, 65, 19, 14, 22] },
-      { name: 2024, data: [12, 14, 2, 47, 42, 15, 47, 75, 65, 19, 14, 22] },
-    ],
-  },
+const statistic = {
+  profits: [],
+  users: [],
+  orders: [],
+  ordersPaid: [],
+  productTypes: [],
+  productsBestSeller: [],
+  lastOrders: [],
 };
 
-export const statisticSlice = createSlice({
+const initialState = {
+  statistic,
+};
+const statisticSlice = createSlice({
   name: "statistic",
   initialState,
   reducers: {},
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder.addCase(getStatistic.fulfilled, (state, { payload }) => {
+      state.statistic = payload.data.data;
+    });
+  },
 });
 
 const statisticReducer = statisticSlice.reducer;

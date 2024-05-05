@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import osm from "./osm-providers";
-import "leaflet/dist/leaflet.css";
+// import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-
+// import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import { StyleSheet } from "react-native";
 const markerIcon = new L.Icon({
-  iconUrl: require("./marker.png"),
+  // iconUrl: require("./marker.png"),
   iconSize: [40, 40],
   iconAnchor: [17, 46], //[left/right, top/bottom]
   popupAnchor: [0, -46], //[left/right, top/bottom]
@@ -32,7 +34,6 @@ function ResetCenterView(props: any) {
   return null;
 }
 const CustomMapHistory = ({ selectPosition }: any) => {
-  console.log(selectPosition)
   const [center, setCenter] = useState({ lat: 10.8636778, lng: 106.7397867 });
   const ZOOM_LEVEL = 9;
   const mapRef: any = useRef();
@@ -70,3 +71,15 @@ const CustomMapHistory = ({ selectPosition }: any) => {
 
 export default CustomMapHistory;
 
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    height: 400,
+    width: 400,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+ });

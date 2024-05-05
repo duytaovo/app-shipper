@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, Image } from "native-base";
+import { View, Text, Button, FlatList, Image, Toast } from "native-base";
 import { List, Divider } from "react-native-paper";
 import { Icon, Input } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -61,13 +61,11 @@ export default function SearchBox(props: any) {
   const { address } = router.params as RouteParams;
   const [searchText, setSearchText] = useState<string>(address);
   useEffect(() => {
-    console.log("object");
     const getPosition = async () => {
       const requestOptions: any = {
         method: "GET",
         redirect: "follow",
       };
-
       fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
           address,
@@ -83,7 +81,7 @@ export default function SearchBox(props: any) {
           setOpen(false);
           setSelectPosition(convertedData);
         })
-        .catch((error) => console.log("error", error));
+        .catch((error) => Toast.show(error.message));
     };
     getPosition();
   }, [address]);
@@ -118,6 +116,10 @@ export default function SearchBox(props: any) {
     <View style={{ flex: 1 }}>
       <View>
         <Input
+          style={{
+            borderColor: "black",
+            borderWidth: 1,
+          }}
           size="md"
           variant="unstyled"
           value={searchText}
@@ -163,15 +165,6 @@ export default function SearchBox(props: any) {
                     //     : "transparent",
                   }}
                 >
-                  <List.Icon
-                    icon={() => (
-                      <Image
-                        source={require("./marker.png")}
-                        key={index}
-                        alt="image-marker"
-                      />
-                    )}
-                  />
                   <Text style={{ color: "black" }}>
                     {item?.properties.name}
                   </Text>

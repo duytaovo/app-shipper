@@ -18,7 +18,7 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import FontWrapper from "../../components/wrapper/FontWrapper";
 import HeadingWrapper from "../../components/wrapper/HeadingWrapper";
 import { Avatar, Center, Text, View } from "native-base";
-import { COLORS } from "../../constants";
+import { COLORS, TABS } from "../../constants";
 import tw from "twrnc";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
@@ -27,6 +27,7 @@ import {
   getUserById,
   updateProfile,
 } from "../../redux/slice/user/userSlice";
+import AppBar from "../../components/shared/Appbar";
 
 const PersonalScreen: React.FC = () => {
   const [show, setShow] = useState(false);
@@ -82,12 +83,12 @@ const PersonalScreen: React.FC = () => {
 
       const d = res?.payload.data;
       if (d?.code !== 200) return;
+      await dispatch(getUserById(profile.id));
       toast.show({
         title: "Update success",
         placement: "top",
       });
-      dispatch(getUserById(profile.id));
-      // navigation.navigate(TABS.mainboard);
+      navigation.navigate("MainboardShipper");
     } catch (error) {
       // if (
       //   isAxiosUnprocessableEntityError <
@@ -119,18 +120,8 @@ const PersonalScreen: React.FC = () => {
   return (
     <FontWrapper>
       <View style={{ paddingBottom: 80 }}>
-        <HeadingWrapper style={tw`flex justify-between items-center `}>
-          <AntDesign name="profile" size={24} color="black" style={tw`m-3`} />
-          <Text style={styles.title}>Profile</Text>
-          <TouchableOpacity style={styles.subTitle}>
-            {/* <Text style={{ color: COLORS.primary }}>View all</Text> */}
-            {/* <Icon
-                  {...ICON_ARROW_NEXT}
-                  color={COLORS.primary}
-                  style={styles.icon}
-                /> */}
-          </TouchableOpacity>
-        </HeadingWrapper>
+        <AppBar title="Profile" />
+       
         <Center>
           <Avatar
             mt={2}
@@ -172,7 +163,7 @@ const PersonalScreen: React.FC = () => {
       )}
       <VStack space={3} mt="5" mx={2}>
         <FormControl>
-          <FormControl.Label>User name</FormControl.Label>
+          <FormControl.Label>Tên </FormControl.Label>
           <Controller
             control={control}
             name="fullName"
@@ -196,7 +187,7 @@ const PersonalScreen: React.FC = () => {
           />
         </FormControl>
         <FormControl>
-          <FormControl.Label>Password</FormControl.Label>
+          <FormControl.Label>Mật khẩu</FormControl.Label>
           <Controller
             control={control}
             name="password"
@@ -251,7 +242,7 @@ const PersonalScreen: React.FC = () => {
             />
           </FormControl>
           <FormControl>
-            <FormControl.Label>Phone</FormControl.Label>
+            <FormControl.Label>Số điện thoại</FormControl.Label>
             <Controller
               control={control}
               name="phoneNumber"
@@ -275,7 +266,7 @@ const PersonalScreen: React.FC = () => {
             />
           </FormControl>
           <FormControl>
-            <FormControl.Label>Address</FormControl.Label>
+            <FormControl.Label>Điện thoại</FormControl.Label>
             <Controller
               control={control}
               name="address"

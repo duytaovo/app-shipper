@@ -5,7 +5,32 @@ import { useAppDispatch, useAppSelector } from "../../../hooks/useRedux";
 import { getChatUsers, setChatByUser } from "../../../redux/slice/chat/chat";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
+interface Person {
+  id: number;
+  fullName: string;
+  phoneNumber: string;
+  // ... other properties
+}
 
+function filterUniquePeopleById(data: Person[]): Person[][] {
+  const uniquePeopleGroups: Person[][] = [];
+
+  for (const person of data) {
+    const matchingGroupIndex = uniquePeopleGroups.findIndex(
+      (group) => group[0].id === person.id,
+    );
+
+    if (matchingGroupIndex === -1) {
+      // No matching group found, create a new one
+      uniquePeopleGroups.push([person]);
+    } else {
+      // Matching group found, add person to that group
+      uniquePeopleGroups[matchingGroupIndex].push(person);
+    }
+  }
+
+  return uniquePeopleGroups;
+}
 var stompClient: any = null;
 const ChatsScreenAdmin: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -19,6 +44,23 @@ const ChatsScreenAdmin: React.FC = () => {
   });
 
   const { chats } = useAppSelector((state) => state.chatShipper);
+  const filteredGroups = filterUniquePeopleById(chats.data);
+  function filterUniquePeople(data: Person[][]): Person[] {
+    const uniquePeople: Person[] = [];
+    const seenIds = new Set<number>();
+
+    for (const innerArray of data) {
+      for (const person of innerArray) {
+        if (!seenIds.has(person.id)) {
+          seenIds.add(person.id);
+          uniquePeople.push(person);
+        }
+      }
+    }
+
+    return uniquePeople;
+  }
+  const filteredPeople = filterUniquePeople(filteredGroups);
   const _getData = async () => {
     await dispatch(
       getChatUsers({
@@ -74,8 +116,10 @@ const ChatsScreenAdmin: React.FC = () => {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <Pressable>
-        {chats?.data?.map((item, index) => (
-          <UserChat key={index} item={item} stompClient={stompClient} />
+        {filteredPeople?.map((item: any, index) => (
+          // <div key={index}>
+            <UserChat key={index} item={item} stompClient={stompClient} />
+          // </div>
         ))}
       </Pressable>
     </ScrollView>

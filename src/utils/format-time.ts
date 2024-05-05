@@ -26,8 +26,12 @@ export function fToNow(date: any) {
     : "";
 }
 
-export const formatTimeChat = (time: any) => {
-  const options: any = { hour: "2-digit", minute: "2-digit" };
-  return new Date(Number(time)).toLocaleString("en-US", options);
+export const formatTimeChat = (time: number) => {
+  console.log("time" + time)
+  const options: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return new Date(time).toLocaleTimeString("en-US", options);
 };
 

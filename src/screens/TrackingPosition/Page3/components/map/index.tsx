@@ -1,56 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-  Polyline,
-} from "react-leaflet";
-import osm from "./osm-providers";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import { StyleSheet, View, Text } from "react-native";
+import MapView, { Marker, Callout, Polyline } from "react-native-maps";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const markerIcon = new L.Icon({
-  iconUrl: require("./mark.png"),
-  iconSize: [40, 40],
-  iconAnchor: [17, 46], //[left/right, top/bottom]
-  popupAnchor: [0, -46], //[left/right, top/bottom]
-});
-const markerIconStart = new L.Icon({
-  iconUrl: require("./marker.png"),
-  iconSize: [40, 40],
-  iconAnchor: [17, 46], //[left/right, top/bottom]
-  popupAnchor: [0, -46], //[left/right, top/bottom]
-});
-function ResetCenterView(props: any) {
-  const { selectPosition } = props;
-  const map = useMap();
+const markerIcon = require("./mark.png");
+const markerIconStart = require("./marker.png");
 
-  useEffect(() => {
-    if (selectPosition) {
-      map.setView(
-        L.latLng(
-          selectPosition?.geometry?.coordinates[1],
-          selectPosition?.geometry?.coordinates[0],
-        ),
-        map.getZoom(),
-        {
-          animate: true,
-        },
-      );
-    }
-  }, [selectPosition]);
-
-  return null;
-}
-const CustomMapHistory = () => {
-  const [center, setCenter] = useState({ lat: 10.8636778, lng: 106.7397867 });
+const CustomMapTracking3 = () => {
+  const [center, setCenter] = useState({
+    latitude: 10.8636778,
+    longitude: 106.7397867,
+  });
   const ZOOM_LEVEL = 9;
-  const mapRef: any = useRef();
-  const [itemStart, setItemStart] = React.useState<any>();
-  const [itemEnd, setItemEnd] = React.useState<any>();
+  const mapRef = useRef(null);
+  const [itemStart, setItemStart] = useState<any>(null);
+  const [itemEnd, setItemEnd] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,8 +28,6 @@ const CustomMapHistory = () => {
         if (endData) {
           setItemEnd(JSON.parse(endData));
         }
-        if (startData && endData) {
-        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -74,70 +36,95 @@ const CustomMapHistory = () => {
     fetchData();
   }, []);
 
-  const pointB = [
-    itemEnd?.geometry?.coordinates[1],
-    itemEnd?.geometry?.coordinates[0],
-  ];
+  const pointB = itemEnd
+    ? [itemEnd.geometry.coordinates[1], itemEnd.geometry.coordinates[0]]
+    : null;
 
   return (
-    <MapContainer
-      center={center}
-      zoom={ZOOM_LEVEL}
-      ref={mapRef}
-      style={{ height: "600px", width: "100%", position: "unset" }}
-    >
-      <TileLayer
-        url={osm.maptiler.url}
-        attribution={osm.maptiler.attribution}
-      />
-
-      {itemStart && itemStart.geometry && itemStart.geometry.coordinates && (
-        <>
+    <View style={styles.container}>
+      <MapView
+        maxZoomLevel={20}
+        minZoomLevel={0}
+        zoomEnabled={true}
+        style={styles.map}
+        ref={mapRef}
+        initialRegion={{
+          latitude: center.latitude,
+          longitude: center.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        {itemStart && itemStart.geometry && itemStart.geometry.coordinates && (
           <Marker
-            position={[
-              itemStart?.geometry.coordinates[1],
-              itemStart?.geometry.coordinates[0],
-            ]}
-            icon={markerIconStart}
+            coordinate={{
+              latitude: itemStart.geometry.coordinates[1],
+              longitude: itemStart.geometry.coordinates[0],
+            }}
+            image={markerIconStart}
           >
-            <Popup>
-              <b>{itemStart.properties.name}</b>
-            </Popup>
+            <Callout>
+              <View>
+                <Text>{itemStart.properties.name}</Text>
+              </View>
+            </Callout>
           </Marker>
-
-          {itemEnd && itemEnd?.geometry && itemEnd.geometry.coordinates && (
-            <>
-              <Marker
-                position={[
-                  itemEnd?.geometry.coordinates[1],
-                  itemEnd?.geometry.coordinates[0],
-                ]}
-                icon={markerIcon}
-              >
-                <Popup>
-                  <b>{itemEnd.properties.name}</b>
-                </Popup>
-              </Marker>
-
-              <Polyline
-                positions={[
-                  [
-                    itemStart?.geometry?.coordinates[1],
-                    itemStart?.geometry?.coordinates[0],
-                  ],
-                  pointB,
-                ]}
-                color="red"
-              />
-            </>
-          )}
-        </>
-      )}
-
-      <ResetCenterView selectPosition={itemStart} />
-    </MapContainer>
+        )}
+        {itemEnd && itemEnd.geometry && itemEnd.geometry.coordinates && (
+          <Marker
+            coordinate={{
+              latitude: itemEnd.geometry.coordinates[1],
+              longitude: itemEnd.geometry.coordinates[0],
+            }}
+            image={markerIcon}
+          >
+            <Callout>
+              <View>
+                <Text>{itemEnd.properties.name}</Text>
+              </View>
+            </Callout>
+          </Marker>
+        )}
+        {pointB && (
+          <Polyline
+            coordinates={[
+              {
+                latitude: itemStart.geometry.coordinates[1],
+                longitude: itemStart.geometry.coordinates[0],
+              },
+              {
+                latitude: pointB[0],
+                longitude: pointB[1],
+              },
+            ]}
+            strokeColor="#f00"
+            strokeWidth={3}
+          />
+        )}
+        {/* <MapViewDirections
+          origin={origin}
+          destination={destination}
+          apikey={GOOGLE_MAPS_KEY}
+          strokeColor="black"
+          strokeWidth={5}
+        /> */}
+      </MapView>
+    </View>
   );
 };
 
-export default CustomMapHistory;
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    height: 600,
+    width: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});
+
+export default CustomMapTracking3;
 

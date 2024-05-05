@@ -3,7 +3,6 @@ import {
   Box,
   Text,
   Pressable,
-  useToast,
   View,
   Image,
   Toast,
@@ -29,7 +28,6 @@ interface RouteParams {
 }
 // chi tiết đơn hàng
 const DetailOrderInfo: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<number>(0); // Trang hiệ
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const router = useRoute();
@@ -181,7 +179,7 @@ const DetailOrderInfo: React.FC = () => {
   return (
     <>
       <Box style={styles.container}>
-        <AppBar title="" />
+        <AppBar title="Đặt hàng" />
         {isGettingData ? (
           <LoadingComponent />
         ) : (
@@ -243,12 +241,12 @@ const DetailOrderInfo: React.FC = () => {
               <Text style={styles.guestInfoAddr}>
                 {"Ngày mua:"} {orderDetail?.buyDate.substring(0, 10)}
               </Text>
-              <Text style={styles.guestInfoStatusInner}>
+              {/* <Text style={styles.guestInfoStatusInner}>
                 {"Trạng thái: "}
                 <Text style={styles.guestInfoStatusInner}>
                   {orderDetail?.orderStatusString}
                 </Text>
-              </Text>
+              </Text> */}
             </Box>
 
             <Box style={styles.priceSection}>
@@ -281,7 +279,7 @@ const DetailOrderInfo: React.FC = () => {
                 </Text>
               </Text>
             </Box>
-            <Box style={styles.btnGroupBottom}>
+            {/* <Box style={styles.btnGroupBottom}>
               <Box style={styles.btnGroupInner}>
                 <Pressable
                   style={styles.btnInner1}
@@ -311,7 +309,7 @@ const DetailOrderInfo: React.FC = () => {
                   </Pressable>
                 ) : null}
               </Box>
-            </Box>
+            </Box> */}
           </ScrollView>
         )}
 

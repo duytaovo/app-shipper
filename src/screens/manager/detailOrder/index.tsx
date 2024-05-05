@@ -248,7 +248,7 @@ const DetailOrderInfo: React.FC = () => {
   return (
     <>
       <Box style={styles.container}>
-        <AppBar title="" />
+        <AppBar title="Trang chủ" />
         {isGettingData ? (
           <LoadingComponent />
         ) : (

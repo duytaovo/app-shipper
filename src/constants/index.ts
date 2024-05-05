@@ -19,7 +19,7 @@ export const FONTS = {
 
 export const TABS = {
   home: "Home",
-  login: "LoginUser",
+  login: "Đăng nhập",
   waitForItTab: "Wait For It Tab",
   OrderAll: "OrderAll",
   OrderComfirmed: "OrderComfirmed",
@@ -31,11 +31,11 @@ export const TABS = {
   mainboard: "Mainboard",
   WaitForDelivery: "Wait For Delivery",
   Reject: "Reject",
-  register: "Register",
+  register: "Đăng ký",
   mail: "Mail",
   live: "Live",
   notify: "Thông báo",
-  personal: "Tôi",
+  personal: "Profile",
 };
 export const ROUTES = {
   ...TABS,
@@ -43,8 +43,8 @@ export const ROUTES = {
   product: "Product",
   cart: "Cart",
   category: "Category",
-  search: "Search",
-  searchResult: "SearchResult",
+  search: "Tìm kiếm",
+  searchResult: "Kết quả tìm kiếm",
 
   message: "Messenger",
   personal: "Personal",

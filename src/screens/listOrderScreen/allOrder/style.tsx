@@ -8,9 +8,10 @@ export function createStyles() {
   return StyleSheet.create({
     container: {
       // paddingHorizontal: 16,
-      backgroundColor: "white",
+      // backgroundColor: "white",
       flex: 1,
       height: WINDOW_HEIGHT,
+      overflow: "scroll",
     },
     addrBtnSection: {
       display: "flex",
@@ -70,6 +71,11 @@ export function createStyles() {
       backgroundColor: COLORS.primary,
       borderTopRightRadius: 5,
       borderBottomRightRadius: 5,
+    },
+    btnReject: {
+      color: "black",
+      fontSize: 15,
+      backgroundColor: colorPalletter.red[600],
     },
   });
 }

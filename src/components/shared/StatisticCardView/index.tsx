@@ -1,14 +1,16 @@
 import React, { useMemo, useEffect, useState } from "react";
-import { Box, Text, Pressable, View } from "native-base";
+import { Text, Pressable, View } from "native-base";
 import { createStyles } from "./style";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { colorPalletter } from "../../../assets/theme/color";
+import { formatSellNumber } from "../../../utils/common";
+import { formatCurrency, formatMoney } from "../../../utils/utils";
 
 const StatisticCardView = ({
   title = "Chuyến đi",
   iconName = "airplane",
-  value = "3/3",
+  value = "0",
   unit = "đơn",
   navToPage = null,
 }) => {
@@ -39,7 +41,7 @@ const StatisticCardView = ({
             ></Ionicons>
           </View>
           <View style={styles.boxFooter}>
-            <Text style={styles.textValue}>{value}</Text>
+            <Text style={styles.textValue}>{formatMoney(Number(value || 0))}</Text>
             <Text style={styles.textUnit}>{unit}</Text>
           </View>
         </View>

@@ -28,8 +28,6 @@ export const orderManagerService = {
     return http.put(`${URL}/approve/${id}`);
   },
   putOrderAssign({ id, shipperId }: { id: number; shipperId: number }) {
-    console.log("id nè" + id)
-    console.log("id nè" + shipperId)
     return http.put(`${URL}/assign/${id}?shipperId=${shipperId}`);
   },
   putOrderReceive(id: any) {

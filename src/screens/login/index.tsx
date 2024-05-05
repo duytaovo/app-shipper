@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Box,
   Checkbox,
@@ -52,10 +52,10 @@ const LoginScreen = () => {
     // navigation.navigate("MainboardShipper");
     // return;
     if (data.phoneNumber === "" || data.password === "") {
-      setErrorsForm({ ...errors, name: "Name is required" });
+      setErrorsForm({ ...errors, name: "Tên là bắt buộc" });
       // return false;
       toast.show({
-        title: "Please enter your phone number or password",
+        title: "Vui lòng nhập tên và mật khẩu",
         placement: "top",
         // error,
       });
@@ -82,13 +82,13 @@ const LoginScreen = () => {
             (res) => {
               if (res?.payload?.data.data.level == 5) {
                 toast.show({
-                  title: "Login success",
+                  title: "Thành công",
                   placement: "top",
                 });
                 navigation.navigate("MainboardAdmin");
               } else {
                 toast.show({
-                  title: "Login success",
+                  title: "Thành công",
                   placement: "top",
                 });
                 navigation.navigate("MainboardShipper");
@@ -128,7 +128,7 @@ const LoginScreen = () => {
           color: "warmGray.50",
         }}
       >
-        Welcome
+        Xin chào
       </Heading>
       <Heading
         mt="1"
@@ -139,11 +139,11 @@ const LoginScreen = () => {
         fontWeight="medium"
         size="xs"
       >
-        Sign in to continue!
+        Đăng nhập để tiếp tục!
       </Heading>
       <VStack space={3} mt="5">
         <FormControl isRequired isInvalid={"phoneNumber" in errorsForm}>
-          <FormControl.Label>Phone Number</FormControl.Label>
+          <FormControl.Label>Số điện thoại</FormControl.Label>
           <Controller
             control={control}
             name="phoneNumber"
@@ -167,7 +167,7 @@ const LoginScreen = () => {
           />
         </FormControl>
         <FormControl isRequired isInvalid={"password" in errorsForm}>
-          <FormControl.Label>Password</FormControl.Label>
+          <FormControl.Label>Mật khẩu</FormControl.Label>
           <Controller
             control={control}
             name="password"
@@ -207,14 +207,14 @@ const LoginScreen = () => {
             alignSelf="flex-end"
             mt="1"
           >
-            Forget Password?
+            Quên mật khẩu?
           </Link>
         </FormControl>
-        <Checkbox.Group accessibilityLabel="choose numbers">
+        {/* <Checkbox.Group accessibilityLabel="choose numbers">
           <Checkbox value="one" my={2}>
             Remember me
           </Checkbox>
-        </Checkbox.Group>
+        </Checkbox.Group> */}
         <Button
           style={styles.btnSubmit}
           isLoading={isSubmitting === true}
@@ -222,33 +222,13 @@ const LoginScreen = () => {
           isLoadingText="Submitting"
           onPress={handleSubmit(onSubmit)}
         >
-          Sign in
+          Đăng nhập
         </Button>
-        <HStack mt="6" justifyContent="center">
-          <Text
-            fontSize="sm"
-            color="coolGray.600"
-            _dark={{
-              color: "warmGray.200",
-            }}
-          >
-            I'm a new user.{" "}
-          </Text>
-          {/* <Link
-            _text={{
-              color: "indigo.500",
-              fontWeight: "medium",
-              fontSize: "sm",
-            }}
-            href="#"
-          >
-            Sign Up
-          </Link> */}
-        </HStack>
+       
       </VStack>
 
       <Button style={tw`mt-4`} onPress={() => navigation.navigate("Main")}>
-        Back
+        Trở lại
       </Button>
     </Box>
   );

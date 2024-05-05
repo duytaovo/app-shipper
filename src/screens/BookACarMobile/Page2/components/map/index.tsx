@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import osm from "./osm-providers";
-import "leaflet/dist/leaflet.css";
+// import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { getTokenFromStore } from "../../../../../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const markerIcon = new L.Icon({

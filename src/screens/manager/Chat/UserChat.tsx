@@ -39,7 +39,7 @@ const UserChat: React.FC<Props> = ({ item, stompClient }) => {
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
   const { chatByUser } = useAppSelector((state) => state.chatShipper);
   const _getData = async () => {
-    await dispatch(getChatUserById(item.id));
+    // await dispatch(getChatUserById(item.id));
   };
 
   useEffect(() => {

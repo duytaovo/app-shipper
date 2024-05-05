@@ -8,6 +8,7 @@ import useGeoLocation from "../../../../../hooks/useGeoLocation";
 import { saveTokenToStore } from "../../../../../utils/storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { convertAddressToCommonFormat } from "../../../../../utils/utils";
+import { useAppSelector } from "../../../../../hooks/useRedux";
 
 const VIETMAP_API_KEY = "9c486497752392adc6b3a4156cb889271e83b5e462f4a54f";
 const VIETMAP_SEARCH_URL =
@@ -18,7 +19,9 @@ interface RouteParams {
 }
 export default function SearchBox(props: any) {
   const { setSelectPosition } = props;
-  const [searchText, setSearchText] = useState<string>("");
+  const { profile } = useAppSelector((state) => state.user);
+
+  const [searchText, setSearchText] = useState<string>(profile.address);
   const [listPlace, setListPlace] = useState<any>([]);
   const [open, setOpen] = useState(false);
   const router = useRoute();
@@ -48,7 +51,6 @@ export default function SearchBox(props: any) {
   };
 
   const location = useGeoLocation();
-
   const showMyLocation = () => {
     if (location.loaded && !location.error) {
       const URL = `https://maps.vietmap.vn/api/reverse/v3?`;
@@ -72,7 +74,7 @@ export default function SearchBox(props: any) {
           setSelectPosition(commonAddressData);
           navigation.navigate("MapTracking2", { address });
         })
-        .catch((err) => Toast.show(err));
+        .catch((err) => console.log(err));
     }
   };
   const handleSearchValue = (text: string) => {
@@ -82,10 +84,8 @@ export default function SearchBox(props: any) {
   };
   return (
     <View style={{ flex: 1 }}>
-      <Button onPress={showMyLocation}>Lấy vị trí của tôi</Button>
-      <View>
-        <Text>Hoặc nhập</Text>
-      </View>
+      {/* <Button onPress={showMyLocation}>Lấy vị trí của tôi</Button> */}
+      <View>{/* <Text>Hoặc nhập</Text> */}</View>
       <View>
         <Input
           style={{
@@ -138,15 +138,6 @@ export default function SearchBox(props: any) {
                     //     : "transparent",
                   }}
                 >
-                  <List.Icon
-                    icon={() => (
-                      <Image
-                        source={require("./marker.png")}
-                        key={index}
-                        alt="image-marker"
-                      />
-                    )}
-                  />
                   <Text style={{ color: "black" }}>
                     {item?.properties.name}
                   </Text>

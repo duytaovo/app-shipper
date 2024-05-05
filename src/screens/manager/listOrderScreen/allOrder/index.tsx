@@ -13,7 +13,6 @@ import {
   Box,
   CheckIcon,
   FlatList,
-  ScrollView,
 } from "native-base";
 import { Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -55,33 +54,27 @@ const OrderAllManager = () => {
   const [searchValueName, setSearchValueName] = useState<string>("");
   const [searchValueProduct, setSearchValueProduct] = useState<string>("");
   const [searchValueAddress, setSearchValueAddress] = useState<string>("");
+  const [searchValueIdShipping, setSearchValueIdShipping] =
+    useState<string>("");
+
   const router = useRoute();
   const { status } = router.params as RouteParams;
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { orderAll } = useAppSelector((state) => state.order);
   const { shippers } = useAppSelector((state) => state.manageShipper);
-
   const [searchValue, setSearchValue] = useState<string>("");
   const debounce = useDebounce({ value: searchValue });
   const styles = useMemo(() => {
     return createStyles();
   }, []);
-  const style = (text: string) => {
-    switch (text) {
-      case "Ordered":
-        return "text-blue-400 ";
-      case "Working":
-        return "text-blue-400 ";
-      case "Rejected":
-        return "text-red-400 ";
-      // case "Success":
-      //   return "text-green-400 ";
-      case "Delivered":
-        return "text-yellow-400 ";
-    }
-  };
+
   const body = {
+    shippingId: searchValueIdShipping || null,
+    completeDateFrom: null,
+    completeDateTo: null,
+    receiveDateFrom: null,
+    receiveDateTo: null,
     orderStatus: [status],
     buyDateFrom: null,
     buyDateTo: null,
@@ -105,10 +98,7 @@ const OrderAllManager = () => {
           params: { pageNumber: currentPage, pageSize: 100 },
         }),
       );
-      if (!orderAll.data.data) {
-        setIsEmptyListOrder(true);
-        setIsGettingData(false);
-      }
+
       setIsGettingData(false);
     };
     getData();
@@ -276,7 +266,11 @@ const OrderAllManager = () => {
     };
     getData();
   };
-
+  const handleSearchValueIdShipping = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueIdShipping(text);
+    }
+  };
   const handleSearchValueName = (text: string) => {
     if (!text.startsWith(" ")) {
       setSearchValueName(text);
@@ -412,9 +406,9 @@ const OrderAllManager = () => {
             </>
           ) : item.orderStatus === 6 ? (
             <Button
-              disabled={true}
+              // disabled={true}
               style={{
-                backgroundColor: colorPalletter.gray["500"],
+                backgroundColor: colorPalletter.green["500"],
                 marginBottom: 10,
               }}
               onPress={() => {
@@ -437,18 +431,32 @@ const OrderAllManager = () => {
               <Text>Gán cho shipper</Text>
             </Button>
           ) : item.orderStatus === 5 ? (
-            <Button
-              disabled={true}
-              style={{
-                backgroundColor: colorPalletter.gray["500"],
-                marginBottom: 10,
-              }}
-              onPress={() => {
-                setShowModal(true);
-              }}
-            >
-              <Text>Đang giao hàng</Text>
-            </Button>
+            <View>
+              <Button
+                disabled={true}
+                style={{
+                  backgroundColor: colorPalletter.gray["500"],
+                  marginBottom: 10,
+                }}
+                onPress={() => {
+                  setShowModal(true);
+                }}
+              >
+                <Text>Đang giao hàng</Text>
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: colorPalletter.red["500"],
+                  marginBottom: 10,
+                  width: "100%",
+                }}
+                onPress={() => {
+                  setShowModalReject(true);
+                }}
+              >
+                <Text>Huỷ đơn</Text>
+              </Button>
+            </View>
           ) : item.orderStatus === 4 ? (
             <Button
               disabled={true}
@@ -477,13 +485,13 @@ const OrderAllManager = () => {
             </Button>
           )}
 
-          <Text
+          {/* <Text
             style={tw`${
               style(item.orderStatusString) || "text-green-600 "
             } uppercase font-bold`}
           >
             {item.orderStatusString}
-          </Text>
+          </Text> */}
         </Box>
 
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
@@ -510,7 +518,7 @@ const OrderAllManager = () => {
                       handleAccept(item.id);
                     }}
                   >
-                    <Text></Text>
+                    <Text>Yes</Text>
                   </Button>
                 ) : null}
                 {item.orderStatus === 1 && showModalReject ? (
@@ -519,7 +527,7 @@ const OrderAllManager = () => {
                       handleCancel(item.id);
                     }}
                   >
-                    <Text></Text>
+                    <Text>Yes</Text>
                   </Button>
                 ) : null}
                 {item.orderStatus === 3 ? (
@@ -602,7 +610,7 @@ const OrderAllManager = () => {
         >
           <Modal.Content maxWidth="400px">
             <View>
-              <LoadingComponent />
+              {/* <LoadingComponent /> */}
               <Text>Đang xử lý ...</Text>
             </View>
           </Modal.Content>
@@ -619,12 +627,9 @@ const OrderAllManager = () => {
             <View width={"full"}>
               <Select
                 background={"gray.500"}
-                defaultValue="21"
                 selectedValue={chooseShipper}
                 minWidth="20"
                 height={"60"}
-                // width="260"
-                // ml={2}
                 accessibilityLabel="Chọn Shipper"
                 placeholder="Chọn Shipper"
                 _selectedItem={{
@@ -634,15 +639,13 @@ const OrderAllManager = () => {
                 mt={1}
                 onValueChange={(itemValue) => setChooseShipper(itemValue)}
               >
-                <Select.Item label="Shipper2" value="21" />
-                {/* <Select.Item
-                  label="Tìm kiếm theo địa chỉ"
-                  value="customerAddress"
-                />
-                <Select.Item
-                  label="Tìm kiếm theo sản phẩm"
-                  value="productName"
-                /> */}
+                {shippers.data.data.map((shipper) => (
+                  <Select.Item
+                    key={shipper.id}
+                    label={shipper.fullName}
+                    value={shipper.id.toString()}
+                  />
+                ))}
               </Select>
             </View>
             <Modal.Footer>
@@ -674,7 +677,7 @@ const OrderAllManager = () => {
   return (
     <>
       {/* <CardCustom /> */}
-      <Appbar title="" />
+      <Appbar title="Đặt hàng" />
       {isGettingData ? (
         <LoadingComponent />
       ) : (
@@ -685,7 +688,33 @@ const OrderAllManager = () => {
             <View>
               <Stack style={styles.wrapper}>
                 <View width={"1/2"} marginLeft={3}>
-                  {methodSearch === "customerName" ? (
+                  {methodSearch === "customerIdShipping" ? (
+                    <Input
+                      size="md"
+                      variant="unstyled"
+                      value={searchValueIdShipping}
+                      onChangeText={handleSearchValueIdShipping}
+                      placeholder={"Tìm kiếm..."}
+                      style={styles.input}
+                      InputRightElement={
+                        <Button
+                          variant="ghost"
+                          colorScheme="blueGray"
+                          onPress={() => {
+                            handleNavigationToSearchResult();
+                          }}
+                        >
+                          <Icon
+                            m="2"
+                            mr="3"
+                            size="6"
+                            color="gray.400"
+                            as={<MaterialIcons name="search" />}
+                          />
+                        </Button>
+                      }
+                    />
+                  ) : methodSearch === "customerName" ? (
                     <Input
                       size="md"
                       variant="unstyled"
@@ -783,6 +812,10 @@ const OrderAllManager = () => {
                     onValueChange={(itemValue) => setMethodSearch(itemValue)}
                   >
                     <Select.Item
+                      label="Tìm kiếm theo mã đơn"
+                      value="customerIdShipping"
+                    />
+                    <Select.Item
                       label="Tìm kiếm theo tên"
                       value="customerName"
                     />
@@ -797,14 +830,30 @@ const OrderAllManager = () => {
                   </Select>
                 </View>
               </Stack>
-              <ScrollView>
-                <FlatList
-                  data={orderAll.data.data}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
-                  showsVerticalScrollIndicator={false}
-                />
-              </ScrollView>
+              <Button
+                style={{
+                  backgroundColor: colorPalletter.blue["500"],
+                  marginBottom: 10,
+                  width: "20%",
+                  marginLeft: 10,
+                }}
+                onPress={() => {
+                  setSearchValueAddress("");
+                  setSearchValueName("");
+                  setSearchValueProduct("");
+                  setSearchValueIdShipping("");
+                }}
+              >
+                <Text style={{ color: "white" }}>Xoá</Text>
+              </Button>
+              {/* <ScrollView> */}
+              <FlatList
+                data={orderAll.data.data}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                showsVerticalScrollIndicator={false}
+              />
+              {/* </ScrollView> */}
             </View>
           )}
         </>

@@ -20,12 +20,10 @@ import ChatMessagesManager from "../screens/manager/Chat/ChatMessagesScreen";
 import ActiveAccountScreen from "../screens/Active Account";
 import ValidatorActiveScreen from "../screens/Active Account/ValidatorCode";
 import StatisticScreen from "../screens/statisticScreen";
-import BookACarMobilePage3 from "../screens/BookACarMobile/Page3";
-import BookACarMobilePage1 from "../screens/BookACarMobile/Page1";
-import BookACarMobilePage2 from "../screens/BookACarMobile/Page2";
-import MapTracking1 from "../screens/TrackingPosition/Page1";
-import MapTracking2 from "../screens/TrackingPosition/Page2";
-import MapTracking3 from "../screens/TrackingPosition/Page3";
+import StatisticScreenManager from "../screens/manager/statisticScreen";
+import TrackingOrder1 from "../screens/TrackingPosition/Page1";
+import TrackingOrder2 from "../screens/TrackingPosition/Page2";
+import TrackingOrder3 from "../screens/TrackingPosition/Page3";
 
 type RootStackParamList = {
   Main: any;
@@ -50,6 +48,7 @@ type RootStackParamList = {
   ChatsAdmin: undefined;
   ChatsShipper: undefined;
   Statistic: undefined;
+  StatisticManager: undefined;
   Map: undefined;
   Map2: undefined;
   Map3: undefined;
@@ -59,9 +58,7 @@ type RootStackParamList = {
   MapTracking2: {
     address: string;
   };
-  MapTracking3: {
-    address: string;
-  };
+  MapTracking3: undefined;
   MessagesShipper: {
     recepientId: number | string;
     stompClient: any;
@@ -158,12 +155,10 @@ const Routes: React.FC = () => {
       <Stack.Screen name="MessagesShipper" component={ChatMessagesShipper} />
       <Stack.Screen name="MessagesManager" component={ChatMessagesManager} />
       <Stack.Screen name="Statistic" component={StatisticScreen} />
-      <Stack.Screen name="Map" component={BookACarMobilePage1} />
-      <Stack.Screen name="Map2" component={BookACarMobilePage2} />
-      <Stack.Screen name="Map3" component={BookACarMobilePage3} />
-      <Stack.Screen name="MapTracking1" component={MapTracking1} />
-      <Stack.Screen name="MapTracking2" component={MapTracking2} />
-      <Stack.Screen name="MapTracking3" component={MapTracking3} />
+      <Stack.Screen name="StatisticManager" component={StatisticScreenManager} />
+      <Stack.Screen name="MapTracking1" component={TrackingOrder1} />
+      <Stack.Screen name="MapTracking2" component={TrackingOrder2} />
+      <Stack.Screen name="MapTracking3" component={TrackingOrder3} />
     </Stack.Navigator>
   );
 };

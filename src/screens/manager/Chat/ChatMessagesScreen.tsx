@@ -52,17 +52,17 @@ const ChatMessagesManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
-  const { chatByUser } = useAppSelector((state) => state.chatShipper);
+  let { data } = useAppSelector((state) => state.chatShipper.chatByUser);
   const { profile } = useAppSelector((state) => state.user);
   const _getData = async () => {
-    // await dispatch(getChatUserById(recepientId));
+    await dispatch(getChatUserById(recepientId));
   };
 
   useEffect(() => {
     const getData = async () => {
       setIsGettingData(true);
       await _getData();
-      if (!chatByUser.data) {
+      if (!data) {
         setIsEmptyListOrder(true);
       } else {
         setIsEmptyListOrder(false);
@@ -81,7 +81,7 @@ const ChatMessagesManager: React.FC = () => {
           receiverId: recepientId,
           receiverName: receiverName,
           message: message,
-          date: Number(new Date().getTime()),
+          date: new Date().toISOString(),
           status: "MESSAGE",
           attachmentUrl: selectedImage,
         };
@@ -191,7 +191,7 @@ const ChatMessagesManager: React.FC = () => {
         contentContainerStyle={{ flexGrow: 1 }}
         onContentSizeChange={handleContentSizeChange}
       >
-        {chatByUser.data.map((item: any, index: number) => {
+        {[...data].reverse().map((item: any, index: number) => {
           if (item?.message?.length > 0) {
             // const isSelected = selectedMessages.includes(item._id);
             return (

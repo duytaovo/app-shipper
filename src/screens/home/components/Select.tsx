@@ -81,7 +81,7 @@ const Select: React.FC = () => {
               }}
               onPress={() => handleNavigateToOrder()}
             />
-            Make Order
+            Đơn đặt hàng
           </Box>
           <Box
             style={tw`w-1/2`}
@@ -124,7 +124,7 @@ const Select: React.FC = () => {
               }}
               onPress={() => handleNavigateToMessage()}
             />
-            Message
+            Nhắn tin
           </Box>
         </View>
       </HStack>
@@ -136,7 +136,7 @@ const Select: React.FC = () => {
           justifyContent="center"
           mb={3}
         >
-          <Box
+          {/* <Box
             style={tw`w-1/2 mr-2`}
             bg={{
               linearGradient: {
@@ -178,7 +178,7 @@ const Select: React.FC = () => {
               onPress={() => handleNavigateToMap()}
             />
             Nearby Drop
-          </Box>
+          </Box> */}
           <Box
             style={tw`w-1/2`}
             bg={{
@@ -220,7 +220,7 @@ const Select: React.FC = () => {
               }}
               onPress={() => handleNavigateToStatistic()}
             />
-            Statistic
+            Thống kê
           </Box>
         </View>
       </HStack>

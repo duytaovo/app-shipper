@@ -65,11 +65,23 @@ export const getIdFromNameId = (name: string) => {
 //   avatarName ? `${config.baseUrl}images/${avatarName}` : userImage;
 
 export function formatCurrency(currency: number) {
-  return new Intl.NumberFormat("de-DE").format(currency);
+  return new Intl.NumberFormat("vi-VN").format(currency);
 }
 
+export const formatMoney = (value: number): string => {
+  if (value >= 1000000000) {
+    return `${(value / 1000000000).toFixed(1)}b`;
+  } else if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(1)}m`;
+  } else if (value >= 1000) {
+    return `${(value / 1000).toFixed(1)}k`;
+  } else {
+    return value.toLocaleString();
+  }
+};
+
 export function formatNumberToSocialStyle(value: number) {
-  return new Intl.NumberFormat("en", {
+  return new Intl.NumberFormat("vn", {
     notation: "compact",
     maximumFractionDigits: 1,
   })
@@ -150,3 +162,4 @@ export const convertAddressToCommonFormat = (addressData: any) => {
     return null;
   }
 };
+

@@ -20,6 +20,7 @@ import { forgotPassword } from "../../redux/slice/user/userSlice";
 import { createStyle } from "../login/style";
 import { ROUTES } from "../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
+import AppBar from "../../components/shared/Appbar";
 
 const ForgotPassScreen: React.FC = () => {
   const [show, setShow] = useState(false);
@@ -105,6 +106,7 @@ const ForgotPassScreen: React.FC = () => {
 
   return (
     <Box style={styles.container}>
+       <AppBar title="Quên mật khẩu" />
       <Heading
         size="lg"
         fontWeight="600"
@@ -113,22 +115,12 @@ const ForgotPassScreen: React.FC = () => {
           color: "warmGray.50",
         }}
       >
-        Welcome
+        Xin chào
       </Heading>
-      <Heading
-        mt="1"
-        _dark={{
-          color: "warmGray.200",
-        }}
-        color="coolGray.600"
-        fontWeight="medium"
-        size="xs"
-      >
-        Quên mật khẩu !
-      </Heading>
+   
       <VStack space={3} mt="5">
         <FormControl>
-          <FormControl.Label>Phone Number</FormControl.Label>
+          <FormControl.Label>Số điện thoại</FormControl.Label>
           <Controller
             control={control}
             name="phoneNumber"

@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, TextInput, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
-// Thay thế các biểu tượng MUI bằng biểu tượng của React Native hoặc thư viện khác nếu cần
+import { Entypo } from "@expo/vector-icons";
 import DriveEtaOutlinedIcon from "react-native-vector-icons/MaterialIcons";
-import LocationOnOutlinedIcon from "react-native-vector-icons/MaterialIcons";
-import FmdGoodIcon from "react-native-vector-icons/MaterialIcons";
 import { getTokenFromStore } from "../../../../../utils/storage";
-import { Button, IconButton } from "native-base";
+import { Button } from "native-base";
 import SearchBox from "../map/SearchBox";
 
 export default function Address({ selectPosition, setSelectPosition }: any) {
@@ -28,7 +25,7 @@ export default function Address({ selectPosition, setSelectPosition }: any) {
     if (!selectPosition) {
       Alert.alert("Thông báo", "Bạn phải nhập điểm đến");
     } else {
-      navigation.navigate("Map3");
+      navigation.navigate("MapTracking3");
     }
   };
 
@@ -52,16 +49,24 @@ export default function Address({ selectPosition, setSelectPosition }: any) {
           size={30}
           color="blue"
         />
-        <LocationOnOutlinedIcon name="location-on" size={30} color="red" />
       </View>
       <View style={{ flex: 1 }}>
+        <Entypo name="location-pin" size={24} color="black" />
         <Text numberOfLines={1} ellipsizeMode="tail">
           {itemStart?.properties?.name || itemStart?.display}
         </Text>
         <View
           style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}
         >
-          <Text style={{ color: "black", opacity: 0.7 }}>
+          <Text
+            style={{
+              color: "black",
+              opacity: 0.7,
+              marginTop: 2,
+              fontWeight: "700",
+              marginVertical: 3,
+            }}
+          >
             Nhập địa điểm đến
           </Text>
         </View>

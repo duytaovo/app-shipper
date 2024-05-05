@@ -1,71 +1,72 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import osm from "./osm-providers";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { Dimensions, StyleSheet, View } from "react-native";
 
-const markerIcon = new L.Icon({
-  iconUrl: require("./marker.png"),
-  iconSize: [40, 40],
-  iconAnchor: [17, 46], //[left/right, top/bottom]
-  popupAnchor: [0, -46], //[left/right, top/bottom]
-});
-function ResetCenterView(props: any) {
-  const { selectPosition } = props;
-  const map = useMap();
-
+const markerIcon = require("./marker.png");
+function ResetCenterView({ selectPosition, mapRef }: any) {
   useEffect(() => {
     if (selectPosition) {
-      map.setView(
-        L.latLng(
-          selectPosition?.geometry.coordinates[1],
-          selectPosition?.geometry.coordinates[0],
-        ),
-        map.getZoom(),
-        {
-          animate: true,
-        },
-      );
+      mapRef.current.animateToRegion({
+        latitude: selectPosition.geometry.coordinates[1],
+        longitude: selectPosition.geometry.coordinates[0],
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
     }
   }, [selectPosition]);
 
   return null;
 }
+
 const CustomMapHistory = ({ selectPosition }: any) => {
-  const [center, setCenter] = useState({ lat: 10.8636778, lng: 106.7397867 });
-  const ZOOM_LEVEL = 9;
-  const mapRef: any = useRef();
+  const mapRef = useRef(null);
+
   const locationSelection: any = selectPosition?.geometry
-    ? [
-        selectPosition.geometry.coordinates[1],
-        selectPosition.geometry.coordinates[0],
-      ]
+    ? {
+        latitude: selectPosition.geometry.coordinates[1],
+        longitude: selectPosition.geometry.coordinates[0],
+      }
     : null;
 
   return (
-    <MapContainer
-      center={center}
-      zoom={ZOOM_LEVEL}
-      ref={mapRef}
-      style={{ height: "600px", width: "100%", position: "unset" }}
-    >
-      <TileLayer
-        url={osm.maptiler.url}
-        attribution={osm.maptiler.attribution}
-      />
-      {selectPosition && (
-        <Marker position={locationSelection} icon={markerIcon}>
-          <Popup>
-            <b>
-              {locationSelection[1]}, {locationSelection[0]}
-            </b>
-          </Popup>
-        </Marker>
-      )}
-      <ResetCenterView selectPosition={selectPosition} />
-    </MapContainer>
+    <View style={styles.container}>
+      <MapView
+        // provider={PROVIDER_GOOGLE}
+        // showsUserLocation
+        ref={mapRef}
+        style={styles.map}
+        initialRegion={{
+          latitude: 10.8636778,
+          longitude: 106.7397867,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        {selectPosition && (
+          <Marker
+            coordinate={locationSelection}
+            title={`${locationSelection.title}`}
+            image={markerIcon}
+          />
+        )}
+        <ResetCenterView selectPosition={selectPosition} mapRef={mapRef} />
+      </MapView>
+    </View>
   );
 };
 
 export default CustomMapHistory;
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    height: 600,
+    width: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});
 

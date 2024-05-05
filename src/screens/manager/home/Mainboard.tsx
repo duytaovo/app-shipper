@@ -28,7 +28,7 @@ const MainboardAdmin: React.FC = () => {
       onRefresh={() => {}}
       style={styles.container}
     >
-      <AppBar title="" />
+      <AppBar title="Trang chủ" />
       <VStack
         w="100%"
         space={5}
@@ -42,7 +42,7 @@ const MainboardAdmin: React.FC = () => {
           }}
         />
         <Input
-          placeholder="Search..."
+          placeholder="Tìm kiếm..."
           width="90%"
           borderRadius="4"
           py="3"

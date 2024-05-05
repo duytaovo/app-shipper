@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import * as Location from "expo-location";
 
 const useGeoLocation = () => {
   const [location, setLocation] = useState({
@@ -7,18 +8,18 @@ const useGeoLocation = () => {
     coordinates: { lat: "", lng: "" },
   });
 
-  const onSuccess = (location: any) => {
+  const onSuccess = (position: any) => {
     setLocation({
       loaded: true,
       error: false,
       coordinates: {
-        lat: location.coords.latitude,
-        lng: location.coords.longitude,
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
       },
     });
   };
 
-  const onError = (error: any) => {
+  const onError = () => {
     setLocation({
       loaded: true,
       error: true,
@@ -28,15 +29,29 @@ const useGeoLocation = () => {
       },
     });
   };
+
   useEffect(() => {
-    if (!("geolocation" in navigator)) {
-      onError({
-        code: 0,
-        message: "Vị trí không hỗ trợ",
-      });
-    }
-    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    const getLocationAsync = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          throw new Error("Permission to access location was denied");
+        }
+
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        onSuccess(currentLocation);
+      } catch (error) {
+        onError();
+      }
+    };
+
+    getLocationAsync();
+
+    return () => {
+      // Cleanup function if needed
+    };
   }, []);
+
   return location;
 };
 

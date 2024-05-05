@@ -16,13 +16,15 @@ import { BackHandler } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
-import { activeAccount } from "../../redux/slice/user/userSlice";
+import { activeAccount, getUserById } from "../../redux/slice/user/userSlice";
 import { createStyle } from "../login/style";
 import { unwrapResult } from "@reduxjs/toolkit";
+import AppBar from "../../components/shared/Appbar";
 
 const ActiveAccountScreen: React.FC = () => {
   const [show, setShow] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { profile, userWithId } = useAppSelector((state) => state.user);
 
   const styles = useMemo(() => {
     return createStyle();
@@ -67,6 +69,7 @@ const ActiveAccountScreen: React.FC = () => {
           title: "Success",
           placement: "top",
         });
+        await dispatch(getUserById(profile.id));
         navigation.navigate("MainboardShipper");
       } catch (error) {
         // if (
@@ -99,6 +102,7 @@ const ActiveAccountScreen: React.FC = () => {
 
   return (
     <Box style={styles.container}>
+       <AppBar title="Kích hoạt tài khoản" />
       <Heading
         size="lg"
         fontWeight="600"
@@ -107,7 +111,7 @@ const ActiveAccountScreen: React.FC = () => {
           color: "warmGray.50",
         }}
       >
-        Welcome
+        Xin chào
       </Heading>
       <Heading
         mt="1"
@@ -122,7 +126,7 @@ const ActiveAccountScreen: React.FC = () => {
       </Heading>
       <VStack space={3} mt="5">
         <FormControl>
-          <FormControl.Label>Phone Number</FormControl.Label>
+          <FormControl.Label>Số điện thoại</FormControl.Label>
           <Controller
             control={control}
             name="phoneNumber"
@@ -183,7 +187,7 @@ const ActiveAccountScreen: React.FC = () => {
       </VStack>
 
       <Button style={tw`mt-4`} onPress={() => navigation.goBack()}>
-        Back
+        Trở lại
       </Button>
     </Box>
   );

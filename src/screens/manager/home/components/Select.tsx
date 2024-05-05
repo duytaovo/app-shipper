@@ -21,6 +21,10 @@ const Select: React.FC = () => {
     navigation.navigate("ManagerChat");
   };
 
+  const handleNavigateToStatistic = () => {
+    navigation.navigate("StatisticManager");
+  };
+
   return (
     <FontWrapper style={tw``}>
       <HStack space={3} justifyContent="center" mb={3}>
@@ -73,7 +77,7 @@ const Select: React.FC = () => {
               }}
               onPress={() => handleNavigateToOrder()}
             />
-            Make Order
+           Đơn đặt hàng
           </Box>
           <Box
             style={tw`w-1/2`}
@@ -116,7 +120,7 @@ const Select: React.FC = () => {
               }}
               onPress={() => handleNavigateToMessage()}
             />
-            Message
+            Nhắn tin
           </Box>
         </View>
       </HStack>
@@ -128,8 +132,8 @@ const Select: React.FC = () => {
           justifyContent="center"
           mb={3}
         >
-          <Box
-           style={tw`w-1/2 mr-2`}
+          {/* <Box
+            style={tw`w-1/2 mr-2`}
             bg={{
               linearGradient: {
                 colors: ["#9195F6", "#74E291"],
@@ -169,7 +173,7 @@ const Select: React.FC = () => {
               }}
             />
             Nearby Drop
-          </Box>
+          </Box> */}
           <Box
             style={tw`w-1/2`}
             bg={{
@@ -209,8 +213,9 @@ const Select: React.FC = () => {
                   },
                 },
               }}
+              onPress={() => handleNavigateToStatistic()}
             />
-            Help Center
+            Thống kê
           </Box>
         </View>
       </HStack>

@@ -18,22 +18,13 @@ import EmojiSelector from "react-native-emoji-selector";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
-import { setChatByUser, uploadImage } from "../../redux/slice/chat/chat";
+import {
+  getChatUserById,
+  setChatByUser,
+  uploadImage,
+} from "../../redux/slice/chat/chat";
 import { formatTimeChat } from "../../utils/format-time";
 import { unwrapResult } from "@reduxjs/toolkit";
-interface Message {
-  code: number;
-  message: string;
-  data: {
-    senderId: number;
-    senderName: string;
-    receiverId: number;
-    receiverName: string;
-    message: string;
-    date: string;
-    status: string;
-  };
-}
 
 const ChatMessagesShipper: React.FC = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -55,19 +46,18 @@ const ChatMessagesShipper: React.FC = () => {
   const dispatch = useAppDispatch();
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
-  const { chatByUser } = useAppSelector((state) => state.chatShipper);
-  const { profile } = useAppSelector((state) => state.user);
-  console.log(profile);
-  console.log(chatByUser);
-  const _getData = () => {
-    // dispatch(getChatUserById(recepientId));
-  };
+  let { data } = useAppSelector((state) => state.chatShipper.chatByUser);
 
+ 
+  const { profile } = useAppSelector((state) => state.user);
+  const _getData = () => {
+    dispatch(getChatUserById(recepientId));
+  };
   useEffect(() => {
     const getData = async () => {
       setIsGettingData(true);
       await _getData();
-      if (!chatByUser.data) {
+      if (!data) {
         setIsEmptyListOrder(true);
       } else {
         setIsEmptyListOrder(false);
@@ -89,14 +79,11 @@ const ChatMessagesShipper: React.FC = () => {
         const response1: any = await fetch(localUri as string);
         const blob = await response1.blob();
         // Assume "photo" is the name of the form field the server expects
-        form.append(
-          "file",
-          // JSON.parse(JSON.stringify({ uri: localUri, name: filename!, type })),
-          blob,
-        );
+        form.append("file", blob);
         const response = await dispatch(uploadImage(form));
         unwrapResult(response);
         imageUrl = response.payload?.data?.data;
+        console.log(imageUrl);
       }
 
       if (message !== "" || selectedImage !== "") {
@@ -106,7 +93,7 @@ const ChatMessagesShipper: React.FC = () => {
           receiverId: recepientId,
           receiverName: receiverName,
           message: message,
-          date: Number(new Date().getTime()),
+          date: new Date().toISOString(),
           status: "MESSAGE",
           attachmentUrl: selectedImage,
         };
@@ -152,7 +139,7 @@ const ChatMessagesShipper: React.FC = () => {
       quality: 1,
     });
 
-    console.log("result" + JSON.stringify(result));
+    
     if (!result.canceled) {
       setSelectedImage(result?.assets[0]?.uri);
     }
@@ -160,7 +147,7 @@ const ChatMessagesShipper: React.FC = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: receiverName,
+      headerTitle: "Admin",
       headerLeft: () => (
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <Ionicons
@@ -219,7 +206,7 @@ const ChatMessagesShipper: React.FC = () => {
         contentContainerStyle={{ flexGrow: 1 }}
         onContentSizeChange={handleContentSizeChange}
       >
-        {chatByUser.data.map((item: any, index: number) => {
+        {[...data].reverse()?.map((item: any, index: number) => {
           if (item?.message?.length > 0) {
             // const isSelected = selectedMessages.includes(item._id);
             return (
@@ -264,7 +251,7 @@ const ChatMessagesShipper: React.FC = () => {
                     marginTop: 5,
                   }}
                 >
-                  {formatTimeChat(item.date)}
+                  {formatTimeChat(item?.date)}
                 </Text>
               </Pressable>
             );

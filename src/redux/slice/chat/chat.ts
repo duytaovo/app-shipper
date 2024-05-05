@@ -64,7 +64,7 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     setChatByUser: (state: any, action: PayloadAction<any>) => {
-      state.chatByUser.data = [...state.chatByUser.data, action.payload];
+      state.chatByUser.data = [action.payload, ...state.chatByUser.data];
     },
     resetChatByUser: (state) => {
       state.chatByUser.data = [...state.chatByUser.data];

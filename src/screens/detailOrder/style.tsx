@@ -125,6 +125,11 @@ export function createStyles() {
       fontSize: 15,
       textTransform: "uppercase",
     },
+    btnReject: {
+      color: "black",
+      fontSize: 15,
+      backgroundColor: colorPalletter.lime[600],
+    },
     btnTextTitle: {
       display: "flex",
       alignItems: "center",

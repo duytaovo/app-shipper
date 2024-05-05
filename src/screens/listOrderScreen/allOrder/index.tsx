@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useRef } from "react";
 import {
   Text,
   Pressable,
@@ -15,7 +15,7 @@ import {
   FlatList,
   ScrollView,
 } from "native-base";
-import { Linking } from "react-native";
+import { Animated, Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { colorPalletter } from "../../../assets/theme/color";
 import LoadingComponent from "../../../components/Loading";
@@ -35,12 +35,22 @@ import {
 import useDebounce from "../../../hooks/useDebounce";
 import { setQueries } from "../../../redux/slice/querySlice";
 import { saveTokenToStore } from "../../../utils/storage";
+import ScrollRefreshWrapper from "../../../components/wrapper/ScrollRefreshWrapper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Dimensions } from "react-native";
 
 interface RouteParams {
   status: string;
 }
 
 const OrderAllShipper = () => {
+  const animatedValue = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = (e: any) => {
+    const offsetY = e.nativeEvent.contentOffset.y;
+    animatedValue.setValue(offsetY);
+  };
+
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
@@ -53,14 +63,23 @@ const OrderAllShipper = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { orderAll } = useAppSelector((state) => state.order);
+  console.log(orderAll)
   const [searchValueName, setSearchValueName] = useState<string>("");
   const [searchValueProduct, setSearchValueProduct] = useState<string>("");
   const [searchValueAddress, setSearchValueAddress] = useState<string>("");
+  const [searchValueIdShipping, setSearchValueIdShipping] =
+    useState<string>("");
+  const [valueReject, setValueReject] = useState<string>("");
   const debounce = useDebounce({ value: searchValueName });
   const styles = useMemo(() => {
     return createStyles();
   }, []);
   const body = {
+    shippingId: searchValueIdShipping || null,
+    completeDateFrom: null,
+    completeDateTo: null,
+    receiveDateFrom: null,
+    receiveDateTo: null,
     orderStatus: [status],
     buyDateFrom: null,
     buyDateTo: null,
@@ -68,20 +87,6 @@ const OrderAllShipper = () => {
     productName: searchValueProduct || null,
     customerName: searchValueName || null,
     customerAddress: searchValueAddress || null,
-  };
-  const style = (text: string) => {
-    switch (text) {
-      case "Ordered":
-        return "text-blue-400 ";
-      case "Working":
-        return "text-blue-400 ";
-      case "Rejected":
-        return "text-red-400 ";
-      case "Delivered":
-        return "text-yellow-400 ";
-      default:
-        return ""; // Handle default case
-    }
   };
 
   const _getData = async () => {
@@ -97,11 +102,7 @@ const OrderAllShipper = () => {
     const getData = async () => {
       setIsGettingData(true);
       await _getData();
-      if (!orderAll.data.data) {
-        setIsEmptyListOrder(true);
-      } else {
-        setIsEmptyListOrder(false);
-      }
+
       setIsGettingData(false);
     };
     getData();
@@ -159,7 +160,9 @@ const OrderAllShipper = () => {
   const handleReject = async (id: number) => {
     setShowModalReject(false);
     setShowModalReload(true);
-    const res = await dispatch(putOrderReject({ orderId: id }));
+    const res = await dispatch(
+      putOrderReject({ orderId: id, reason: valueReject }),
+    );
     const data = res.payload;
     if (data?.data?.code === 200) {
       await _getData();
@@ -169,6 +172,16 @@ const OrderAllShipper = () => {
       setShowModalReload(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
       return null;
+    }
+  };
+  const handleValueReject = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setValueReject(text);
+    }
+  };
+  const handleSearchValueIdShipping = (text: string) => {
+    if (!text.startsWith(" ")) {
+      setSearchValueIdShipping(text);
     }
   };
 
@@ -198,18 +211,15 @@ const OrderAllShipper = () => {
   const handleNavigationToSearchResult = () => {
     const getData = async () => {
       setIsGettingData(true);
-      _getData();
-      if (orderAll.data.data.length <= 0) {
-        setIsEmptyListOrder(true);
-        setIsGettingData(false);
-      }
+      await _getData();
+
       setIsGettingData(false);
     };
     getData();
   };
   const renderItem = ({ item }: { item: any }) => {
     const displayButtonDelivered = item.orderStatus === 6;
-    console.log(item.id);
+    console.log(item)
     return (
       <Box style={styles.listOrderItem}>
         <Box>
@@ -333,22 +343,15 @@ const OrderAllShipper = () => {
               <Text style={{ color: "white" }}>Yêu cầu giao</Text>
             </Button>
           ) : null}
-
-          {/* <Text
-            style={tw`${
-              style(item.orderStatusString) || "text-green-600"
-            } uppercase font-bold`}
-          >
-            {item.orderStatusString}
-          </Text> */}
         </Box>
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-          <Modal.Content maxWidth="400px">
+          <Modal.Content maxWidth={400}>
             <Modal.CloseButton />
             <Modal.Header>Bạn có chắc chắn!</Modal.Header>
             <Modal.Footer>
               <Button.Group space={2}>
                 <Button
+                  style={styles.btnReject}
                   variant="ghost"
                   colorScheme="blueGray"
                   onPress={() => {
@@ -395,14 +398,27 @@ const OrderAllShipper = () => {
           isOpen={showModalReject}
           onClose={() => setShowModalReject(false)}
         >
-          <Modal.Content maxWidth="400px">
+          <Modal.Content maxWidth={400}>
             <Modal.CloseButton />
             <Modal.Header>
-              <Text style={{ color: "" }}>Bạn có chắc chắn !</Text>
+              <Text style={{ color: "" }}>Vui lòng nhập lý do từ chối !</Text>
             </Modal.Header>
+            <Modal.Content maxWidth={400}>
+              <View height={"1/2"} width={"full"}>
+                <Input
+                  size="md"
+                  variant="unstyled"
+                  value={valueReject}
+                  onChangeText={handleValueReject}
+                  placeholder={"Lý do..."}
+                  style={styles.input}
+                />
+              </View>
+            </Modal.Content>
             <Modal.Footer>
               <Button.Group space={2}>
                 <Button
+                  style={styles.btnReject}
                   variant="ghost"
                   colorScheme="blueGray"
                   onPress={() => {
@@ -427,9 +443,9 @@ const OrderAllShipper = () => {
           isOpen={showModalReload}
           onClose={() => setShowModalReload(false)}
         >
-          <Modal.Content maxWidth="400px">
-            <View height={"1/2"} width={"full"}>
-              <LoadingComponent />
+          <Modal.Content maxWidth={400}>
+            <View >
+              {/* <LoadingComponent /> */}
               <Text>Đang xử lý ...</Text>
             </View>
           </Modal.Content>
@@ -440,7 +456,7 @@ const OrderAllShipper = () => {
 
   return (
     <>
-      <Appbar title="" />
+      <Appbar title="Đặt hàng" />
       {isGettingData ? (
         <LoadingComponent />
       ) : (
@@ -449,128 +465,179 @@ const OrderAllShipper = () => {
             <EmptyListOrder />
           ) : (
             <View>
-              <Stack style={styles.wrapper}>
-                <View width={"1/2"} marginLeft={3}>
-                  {methodSearch === "customerName" ? (
-                    <Input
-                      size="md"
-                      variant="unstyled"
-                      value={searchValueName}
-                      onChangeText={handleSearchValueName}
-                      placeholder={"Tìm kiếm..."}
-                      style={styles.input}
-                      InputRightElement={
-                        <Button
-                          variant="ghost"
-                          colorScheme="blueGray"
-                          onPress={() => {
-                            handleNavigationToSearchResult();
-                          }}
-                        >
-                          <Icon
-                            m="2"
-                            mr="3"
-                            size="6"
-                            color="gray.400"
-                            as={<MaterialIcons name="search" />}
-                          />
-                        </Button>
-                      }
-                    />
-                  ) : methodSearch === "customerAddress" ? (
-                    <Input
-                      size="md"
-                      variant="unstyled"
-                      value={searchValueAddress}
-                      onChangeText={handleSearchValueAddress}
-                      placeholder={"Tìm kiếm..."}
-                      style={styles.input}
-                      InputRightElement={
-                        <Button
-                          variant="ghost"
-                          colorScheme="blueGray"
-                          onPress={() => {
-                            handleNavigationToSearchResult();
-                          }}
-                        >
-                          <Icon
-                            m="2"
-                            mr="3"
-                            size="6"
-                            color="gray.400"
-                            as={<MaterialIcons name="search" />}
-                          />
-                        </Button>
-                      }
-                    />
-                  ) : (
-                    <Input
-                      size="md"
-                      variant="unstyled"
-                      value={searchValueProduct}
-                      onChangeText={handleSearchValueProduct}
-                      placeholder={"Tìm kiếm..."}
-                      style={styles.input}
-                      InputRightElement={
-                        <Button
-                          variant="ghost"
-                          colorScheme="blueGray"
-                          onPress={() => {
-                            handleNavigationToSearchResult();
-                          }}
-                        >
-                          <Icon
-                            m="2"
-                            mr="3"
-                            size="6"
-                            color="gray.400"
-                            as={<MaterialIcons name="search" />}
-                          />
-                        </Button>
-                      }
-                    />
-                  )}
-                </View>
-                <View width={"1/2"}>
-                  <Select
-                    background={"gray.500"}
-                    defaultValue="customerAddress"
-                    selectedValue={methodSearch}
-                    minWidth="100"
-                    width="160"
-                    ml={2}
-                    accessibilityLabel="Chọn phương thức"
-                    placeholder="Chọn phương thức"
-                    _selectedItem={{
-                      bg: "teal.600",
-                      endIcon: <CheckIcon size="5" />,
-                    }}
-                    mt={1}
-                    onValueChange={(itemValue) => setMethodSearch(itemValue)}
-                  >
-                    <Select.Item
-                      label="Tìm kiếm theo tên"
-                      value="customerName"
-                    />
-                    <Select.Item
-                      label="Tìm kiếm theo địa chỉ"
-                      value="customerAddress"
-                    />
-                    <Select.Item
-                      label="Tìm kiếm theo sản phẩm"
-                      value="productName"
-                    />
-                  </Select>
-                </View>
-              </Stack>
-              <ScrollView>
+              <View>
+                <Stack style={styles.wrapper}>
+                  <View width={Dimensions.get('window').width / 2} marginLeft={3}>
+                    {methodSearch === "customerIdShipping" ? (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueIdShipping}
+                        onChangeText={handleSearchValueIdShipping}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    ) : methodSearch === "customerName" ? (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueName}
+                        onChangeText={handleSearchValueName}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    ) : methodSearch === "customerAddress" ? (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueAddress}
+                        onChangeText={handleSearchValueAddress}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    ) : (
+                      <Input
+                        size="md"
+                        variant="unstyled"
+                        value={searchValueProduct}
+                        onChangeText={handleSearchValueProduct}
+                        placeholder={"Tìm kiếm..."}
+                        style={styles.input}
+                        width={200} // Adjust width here
+                        InputRightElement={
+                          <Button
+                            variant="ghost"
+                            colorScheme="blueGray"
+                            onPress={() => {
+                              handleNavigationToSearchResult();
+                            }}
+                          >
+                            <Icon
+                              m="2"
+                              mr="3"
+                              size="6"
+                              color="gray.400"
+                              as={<MaterialIcons name="search" />}
+                            />
+                          </Button>
+                        }
+                      />
+                    )}
+                  </View>
+                  <View width={Dimensions.get('window').width / 2}>
+                    <Select
+                      background={"gray.500"}
+                      defaultValue="customerAddress"
+                      selectedValue={methodSearch}
+                      minWidth={100} // Adjust width here
+                      width="160"
+                      ml={2}
+                      accessibilityLabel="Chọn phương thức"
+                      placeholder="Chọn phương thức"
+                      _selectedItem={{
+                        bg: "teal.600",
+                        endIcon: <CheckIcon size="5" />,
+                      }}
+                      mt={1}
+                      onValueChange={(itemValue) => setMethodSearch(itemValue)}
+                    >
+                      <Select.Item
+                        label="Tìm kiếm theo mã đơn"
+                        value="customerIdShipping"
+                      />
+                      <Select.Item
+                        label="Tìm kiếm theo tên"
+                        value="customerName"
+                      />
+                      <Select.Item
+                        label="Tìm kiếm theo địa chỉ"
+                        value="customerAddress"
+                      />
+                      <Select.Item
+                        label="Tìm kiếm theo sản phẩm"
+                        value="productName"
+                      />
+                    </Select>
+                  </View>
+                </Stack>
+                <Button
+                  style={{
+                    backgroundColor: colorPalletter.blue["500"],
+                    marginBottom: 10,
+                    width: 100, // Adjust width here
+                    marginLeft: 10,
+                  }}
+                  onPress={() => {
+                    setSearchValueAddress("");
+                    setSearchValueName("");
+                    setSearchValueProduct("");
+                    setSearchValueIdShipping("");
+                  }}
+                >
+                  <Text style={{ color: "white" }}>Xoá</Text>
+                </Button>
+                {/* <SafeAreaView style={styles.container}> */}
+
+                {/* </SafeAreaView> */}
+              </View>
                 <FlatList
+                  overflowY={"scroll"}
                   data={orderAll.data.data}
                   renderItem={renderItem}
                   keyExtractor={(item, index) => index.toString()}
-                  showsVerticalScrollIndicator={false}
+                  // showsVerticalScrollIndicator={false}
                 />
-              </ScrollView>
             </View>
           )}
         </>
