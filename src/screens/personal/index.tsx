@@ -119,7 +119,7 @@ const PersonalScreen: React.FC = () => {
 
   return (
     <FontWrapper>
-      <View style={{ paddingBottom: 80 }}>
+      <View style={{ paddingBottom: 20 }}>
         <AppBar title="Profile" />
        
         <Center>

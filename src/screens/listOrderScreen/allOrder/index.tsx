@@ -63,7 +63,7 @@ const OrderAllShipper = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { orderAll } = useAppSelector((state) => state.order);
-  console.log(orderAll)
+  console.log(orderAll);
   const [searchValueName, setSearchValueName] = useState<string>("");
   const [searchValueProduct, setSearchValueProduct] = useState<string>("");
   const [searchValueAddress, setSearchValueAddress] = useState<string>("");
@@ -219,10 +219,13 @@ const OrderAllShipper = () => {
   };
   const renderItem = ({ item }: { item: any }) => {
     const displayButtonDelivered = item.orderStatus === 6;
-    console.log(item)
+    console.log(item);
     return (
       <Box style={styles.listOrderItem}>
         <Box>
+          <Text style={tw`font-medium `}>
+            Mã đơn hàng: <Text>{item?.shippingId}</Text>
+          </Text>
           <Text style={tw`font-medium`}>
             Họ tên: <Text>{item?.nameReceiver}</Text>
           </Text>
@@ -444,7 +447,7 @@ const OrderAllShipper = () => {
           onClose={() => setShowModalReload(false)}
         >
           <Modal.Content maxWidth={400}>
-            <View >
+            <View>
               {/* <LoadingComponent /> */}
               <Text>Đang xử lý ...</Text>
             </View>
@@ -467,7 +470,10 @@ const OrderAllShipper = () => {
             <View>
               <View>
                 <Stack style={styles.wrapper}>
-                  <View width={Dimensions.get('window').width / 2} marginLeft={3}>
+                  <View
+                    width={Dimensions.get("window").width / 2}
+                    marginLeft={3}
+                  >
                     {methodSearch === "customerIdShipping" ? (
                       <Input
                         size="md"
@@ -575,7 +581,7 @@ const OrderAllShipper = () => {
                       />
                     )}
                   </View>
-                  <View width={Dimensions.get('window').width / 2}>
+                  <View width={Dimensions.get("window").width / 2}>
                     <Select
                       background={"gray.500"}
                       defaultValue="customerAddress"
@@ -631,13 +637,13 @@ const OrderAllShipper = () => {
 
                 {/* </SafeAreaView> */}
               </View>
-                <FlatList
-                  overflowY={"scroll"}
-                  data={orderAll.data.data}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
-                  // showsVerticalScrollIndicator={false}
-                />
+              <FlatList
+                overflowY={"scroll"}
+                data={orderAll.data.data}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                // showsVerticalScrollIndicator={false}
+              />
             </View>
           )}
         </>

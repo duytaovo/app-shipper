@@ -295,9 +295,13 @@ const OrderAllManager = () => {
   }, [debounce]);
 
   const renderItem = ({ item }: { item: any }) => {
+    console.log(item)
     return (
       <Box style={styles.listOrderItem} key={item.id}>
         <Box>
+        <Text style={tw`font-medium `}>
+            Mã đơn hàng: <Text>{item?.shippingId}</Text>
+          </Text>
           <Text style={tw`font-medium `}>
             Họ tên: <Text>{item?.nameReceiver}</Text>
           </Text>
