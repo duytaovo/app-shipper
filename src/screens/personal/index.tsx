@@ -266,7 +266,7 @@ const PersonalScreen: React.FC = () => {
             />
           </FormControl>
           <FormControl>
-            <FormControl.Label>Điện thoại</FormControl.Label>
+            <FormControl.Label>Địa chỉ</FormControl.Label>
             <Controller
               control={control}
               name="address"

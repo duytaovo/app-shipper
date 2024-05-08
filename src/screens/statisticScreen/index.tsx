@@ -17,7 +17,7 @@ const StatisticScreen: React.FC = () => {
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const [dateStart, setDateStart] = useState(
-    new Date("2024-05-01T14:23:51.616Z"),
+    new Date(),
   );
   const [dateEnd, setDateEnd] = useState(new Date());
   const [dataOrders, setShowDataOrders] = useState<any>();

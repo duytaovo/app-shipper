@@ -27,9 +27,7 @@ const StatisticScreen: React.FC = () => {
   const [chooseYear, setChooseYear] = useState("");
   const { statistic } = useAppSelector((state) => state.statistic);
 
-  const [dateStart, setDateStart] = useState(
-    new Date("2024-01-01T06:59:28.298Z"),
-  );
+  const [dateStart, setDateStart] = useState(new Date(new Date()));
   const [dateEnd, setDateEnd] = useState(new Date());
   const [statisticLocal, setStatisticLocal] = useState(_statistic);
   const _index: number =
@@ -71,6 +69,7 @@ const StatisticScreen: React.FC = () => {
       dateStart!,
       dateEnd!,
     );
+    console.log("profitInRange :" + profitInRange);
     const userInRange = calculateInRange(
       statistic.users[_index],
       dateStart!,
@@ -113,7 +112,7 @@ const StatisticScreen: React.FC = () => {
         (1000 * 60 * 60 * 24),
     );
     let totalProfit = 0;
-    for (let i = startDay; i <= endDay; i++) {
+    for (let i = startDay - 1; i <= endDay - 1; i++) {
       totalProfit += data?.dayQuantity[i];
     }
 
