@@ -30,6 +30,7 @@ import {
   putOrderAssign,
   putOrderCancel,
   putOrderConfirm,
+  putOrderFailed,
   putOrderReject,
   putOrderSuccess,
 } from "../../../../redux/slice/manager/order/orderSlice";
@@ -240,6 +241,27 @@ const OrderAllManager = () => {
       // toast.error(data.data.message);
     }
   };
+  const handleFailed = async (id: number) => {
+    setShowModalReject(false);
+    setShowModalReload(true);
+    const res = await dispatch(putOrderFailed(id));
+    const data = res.payload;
+    if (data?.data?.code === 200) {
+      await dispatch(
+        getOrders({
+          body: body,
+          params: { pageNumber: currentPage, pageSize: 10 },
+        }),
+      );
+      setShowModalReload(false);
+      Toast.show({ title: "Thành công", placement: "top" });
+    } else {
+      setShowModalReload(false);
+      Toast.show({ title: "Có lỗi !!!", placement: "top" });
+      return null;
+      // toast.error(data.data.message);
+    }
+  };
 
   useEffect(() => {
     if (!debounce.trim()) {
@@ -295,11 +317,11 @@ const OrderAllManager = () => {
   }, [debounce]);
 
   const renderItem = ({ item }: { item: any }) => {
-    console.log(item)
+    console.log(item);
     return (
       <Box style={styles.listOrderItem} key={item.id}>
         <Box>
-        <Text style={tw`font-medium `}>
+          <Text style={tw`font-medium `}>
             Mã đơn hàng: <Text>{item?.shippingId}</Text>
           </Text>
           <Text style={tw`font-medium `}>
@@ -408,7 +430,110 @@ const OrderAllManager = () => {
                 <Text>Giao cho shipper</Text>
               </Button>
             </>
+          ) : item.orderStatus === 21 ? (
+            <Button
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              onPress={() => {
+                setShowModal(true);
+              }}
+            >
+              <Text>Đã giao thành công</Text>
+            </Button>
           ) : item.orderStatus === 6 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              // onPress={() => {
+              //   setShowModal(true);
+              // }}
+            >
+              <Text>Đơn đang chuyển cho shipper khác</Text>
+            </Button>
+          ) : item.orderStatus === 7 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              // onPress={() => {
+              //   setShowModal(true);
+              // }}
+            >
+              <Text>Đơn đã chuyển cho shipper khác</Text>
+            </Button>
+          ) : item.orderStatus === 8 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              // onPress={() => {
+              //   setShowModal(true);
+              // }}
+            >
+              <Text> Đơn giao thất bại lần 1</Text>
+            </Button>
+          ) : item.orderStatus === 9 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              // onPress={() => {
+              //   setShowModal(true);
+              // }}
+            >
+              <Text> Đơn giao thất bại lần 2</Text>
+            </Button>
+          ) : item.orderStatus === 10 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              // onPress={() => {
+              //   setShowModal(true);
+              // }}
+            >
+              <Text> Đơn giao thất bại lần 3</Text>
+            </Button>
+          ) : item.orderStatus === 19 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              // onPress={() => {
+              //   setShowModal(true);
+              // }}
+            >
+              <Text> Đơn đang được shipper trả lại</Text>
+            </Button>
+          ) : item.orderStatus === -1 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.green["500"],
+                marginBottom: 10,
+              }}
+              // onPress={() => {
+              //   setShowModal(true);
+              // }}
+            >
+              <Text> Đơn giao chính thức thất bại</Text>
+            </Button>
+          ) : item.orderStatus === 20 ? (
             <Button
               // disabled={true}
               style={{
@@ -419,7 +544,7 @@ const OrderAllManager = () => {
                 setShowModal(true);
               }}
             >
-              <Text>Đã giao</Text>
+              <Text> Đơn giao chính thức thất bại</Text>
             </Button>
           ) : item.orderStatus === 2 ? (
             <Button
@@ -473,6 +598,32 @@ const OrderAllManager = () => {
               }}
             >
               <Text>Đã giao cho shipper</Text>
+            </Button>
+          ) : item.orderStatus === 0 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.gray["500"],
+                marginBottom: 10,
+              }}
+              onPress={() => {
+                setShowModal(true);
+              }}
+            >
+              <Text>Đã huỷ đơn</Text>
+            </Button>
+          ) : item.orderStatus === 21 ? (
+            <Button
+              disabled={true}
+              style={{
+                backgroundColor: colorPalletter.gray["500"],
+                marginBottom: 10,
+              }}
+              onPress={() => {
+                setShowModal(true);
+              }}
+            >
+              <Text>Đơn đã được khách hàng nhận</Text>
             </Button>
           ) : (
             <Button

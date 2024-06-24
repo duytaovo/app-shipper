@@ -370,7 +370,7 @@ const DetailOrderInfo: React.FC = () => {
                         ? "Xác nhận"
                         : orderDetail.orderStatus === 3
                         ? "Giao cho shipper"
-                        : orderDetail.orderStatus === 6
+                        : orderDetail.orderStatus === 11
                         ? "Đã giao"
                         : orderDetail.orderStatus === 2
                         ? "Gán cho shipper"

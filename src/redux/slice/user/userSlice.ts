@@ -96,7 +96,6 @@ const userSlice = createSlice({
     //   state.token = payload?.data?.data?.token;
     // });
     builder.addCase(getUserById.fulfilled, (state, { payload }) => {
-      console.log(payload.data.data);
       state.profile = payload.data.data;
     });
 

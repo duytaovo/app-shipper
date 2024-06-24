@@ -17,6 +17,10 @@ const Select: React.FC = () => {
     navigation.navigate("OrderAllShipper", { status: 2 });
   };
 
+  const handleNavigateToUnOrder = () => {
+    navigation.navigate("UnOrderAllShipper", { status: 2 });
+  };
+
   const handleNavigateToMessage = () => {
     navigation.navigate("ShipperChat");
   };
@@ -81,7 +85,7 @@ const Select: React.FC = () => {
               }}
               onPress={() => handleNavigateToOrder()}
             />
-            Đơn đặt hàng
+            Đơn giao
           </Box>
           <Box
             style={tw`w-1/2`}
@@ -136,11 +140,11 @@ const Select: React.FC = () => {
           justifyContent="center"
           mb={3}
         >
-          {/* <Box
+          <Box
             style={tw`w-1/2 mr-2`}
             bg={{
               linearGradient: {
-                colors: ["#9195F6", "#74E291"],
+                colors: ["lightBlue.300", "violet.800"],
                 start: [0, 0],
                 end: [1, 0],
               },
@@ -155,17 +159,17 @@ const Select: React.FC = () => {
             }}
           >
             <IconButton
-              icon={<Icon as={FontAwesome5} name="map-marker-alt" />}
+              icon={<Icon as={MaterialCommunityIcons} name="offer" />}
               borderRadius="full"
               _icon={{
-                // color: "black.300",
+                color: "orange.500",
                 size: "4xl",
               }}
               _hover={{
-                bg: "black.300:alpha.20",
+                bg: "orange.600:alpha.20",
               }}
               _pressed={{
-                bg: "black.300:alpha.20",
+                bg: "orange.600:alpha.20",
                 _icon: {
                   name: "offer",
                 },
@@ -175,10 +179,10 @@ const Select: React.FC = () => {
                   },
                 },
               }}
-              onPress={() => handleNavigateToMap()}
+              onPress={() => handleNavigateToUnOrder()}
             />
-            Nearby Drop
-          </Box> */}
+            Đơn yêu cầu trả/đổi
+          </Box>
           <Box
             style={tw`w-1/2`}
             bg={{

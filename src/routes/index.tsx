@@ -24,6 +24,9 @@ import StatisticScreenManager from "../screens/manager/statisticScreen";
 import TrackingOrder1 from "../screens/TrackingPosition/Page1";
 import TrackingOrder2 from "../screens/TrackingPosition/Page2";
 import TrackingOrder3 from "../screens/TrackingPosition/Page3";
+import StatisticScreenShipper from "../screens/manager/statisticScreenShipper";
+import PersonalShipperScreen from "../screens/manager/personalShipper";
+import UnOrderNavigator from "./UnOrderNavigator";
 
 type RootStackParamList = {
   Main: any;
@@ -32,6 +35,7 @@ type RootStackParamList = {
   Login: undefined;
   Messenger: undefined;
   OrderAllShipper: { status: number | string };
+  UnOrderAllShipper: { status: number | string };
   OrderAllAdmin: { status: number | string };
   Search: undefined;
   SearchResult: undefined;
@@ -48,7 +52,9 @@ type RootStackParamList = {
   ChatsAdmin: undefined;
   ChatsShipper: undefined;
   Statistic: undefined;
+  ManageShipperStatistic: undefined;
   StatisticManager: undefined;
+  ProfileShipperManager: undefined;
   Map: undefined;
   Map2: undefined;
   Map3: undefined;
@@ -138,6 +144,11 @@ const Routes: React.FC = () => {
         component={OrderNavigator}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+        name={"UnOrderAllShipper"}
+        component={UnOrderNavigator}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name={"OrderAllAdmin"}
         component={OrderNavigatorAdmin}
@@ -148,6 +159,11 @@ const Routes: React.FC = () => {
         component={DetailOrderInfo}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+       options={{ headerShown: false }}
+        name={"ProfileShipperManager"}
+        component={PersonalShipperScreen}
+      />
       <Stack.Screen name={"ShipperChat"} component={HomeChatShipper} />
       <Stack.Screen name={"ManagerChat"} component={HomeChatManager} />
       <Stack.Screen name="ChatsAdmin" component={ChatsScreenAdmin} />
@@ -155,7 +171,14 @@ const Routes: React.FC = () => {
       <Stack.Screen name="MessagesShipper" component={ChatMessagesShipper} />
       <Stack.Screen name="MessagesManager" component={ChatMessagesManager} />
       <Stack.Screen name="Statistic" component={StatisticScreen} />
-      <Stack.Screen name="StatisticManager" component={StatisticScreenManager} />
+      <Stack.Screen
+        name="ManageShipperStatistic"
+        component={StatisticScreenShipper}
+      />
+      <Stack.Screen
+        name="StatisticManager"
+        component={StatisticScreenManager}
+      />
       <Stack.Screen name="MapTracking1" component={TrackingOrder1} />
       <Stack.Screen name="MapTracking2" component={TrackingOrder2} />
       <Stack.Screen name="MapTracking3" component={TrackingOrder3} />

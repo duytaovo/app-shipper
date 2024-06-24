@@ -72,7 +72,7 @@ const OrderNavigatorAdmin: React.FC = () => {
       />
 
       <Tab.Screen
-        initialParams={{ status: 6 }}
+        initialParams={{ status: 11 }}
         name={TABS.OrderDelivered}
         component={OrderAllManager}
         options={{

@@ -24,6 +24,13 @@ const Select: React.FC = () => {
   const handleNavigateToStatistic = () => {
     navigation.navigate("StatisticManager");
   };
+  const handleNavigateToStatisticShipper = () => {
+    navigation.navigate("ManageShipperStatistic");
+  };
+
+  const handleNavigateToProfileShipper = () => {
+    navigation.navigate("ProfileShipperManager");
+  };
 
   return (
     <FontWrapper style={tw``}>
@@ -77,7 +84,7 @@ const Select: React.FC = () => {
               }}
               onPress={() => handleNavigateToOrder()}
             />
-           Đơn đặt hàng
+            Đơn đặt hàng
           </Box>
           <Box
             style={tw`w-1/2`}
@@ -132,7 +139,7 @@ const Select: React.FC = () => {
           justifyContent="center"
           mb={3}
         >
-          {/* <Box
+          <Box
             style={tw`w-1/2 mr-2`}
             bg={{
               linearGradient: {
@@ -171,9 +178,10 @@ const Select: React.FC = () => {
                   },
                 },
               }}
+              onPress={() => handleNavigateToStatisticShipper()}
             />
-            Nearby Drop
-          </Box> */}
+            Thống kê shipper
+          </Box>
           <Box
             style={tw`w-1/2`}
             bg={{
@@ -216,6 +224,59 @@ const Select: React.FC = () => {
               onPress={() => handleNavigateToStatistic()}
             />
             Thống kê
+          </Box>
+        </View>
+      </HStack>
+      <HStack space={3} justifyContent="center">
+        <View
+          width={"90%"}
+          display={"flex"}
+          flexDirection={"row"}
+          justifyContent="center"
+          mb={3}
+        >
+          <Box
+            style={tw`w-1/2 mr-2`}
+            bg={{
+              linearGradient: {
+                colors: ["#9195F6", "#74E291"],
+                start: [0, 0],
+                end: [1, 0],
+              },
+            }}
+            p="12"
+            rounded="xl"
+            _text={{
+              fontSize: "md",
+              fontWeight: "medium",
+              color: "warmGray.50",
+              textAlign: "center",
+            }}
+          >
+            <IconButton
+              icon={<Icon as={FontAwesome5} name="map-marker-alt" />}
+              borderRadius="full"
+              _icon={{
+                // color: "black.300",
+                size: "4xl",
+              }}
+              _hover={{
+                bg: "black.300:alpha.20",
+              }}
+              _pressed={{
+                bg: "black.300:alpha.20",
+                _icon: {
+                  name: "offer",
+                },
+                _ios: {
+                  _icon: {
+                    size: "2xl",
+                  },
+                },
+              }}
+              onPress={() => handleNavigateToProfileShipper()}
+            />
+            Quản lý thông tin shipper
           </Box>
         </View>
       </HStack>

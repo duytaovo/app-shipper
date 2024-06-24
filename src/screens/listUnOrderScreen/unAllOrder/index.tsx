@@ -25,25 +25,19 @@ import { createStyles } from "./style";
 import { useAppDispatch, useAppSelector } from "../../../hooks/useRedux";
 import { MaterialIcons } from "@expo/vector-icons";
 import tw from "twrnc";
-import {
-  getOrders,
-  putOrderDelivered,
-  putOrderReceive,
-  putOrderReject,
-  putOrderRequest,
-} from "../../../redux/slice/order/orderSlice";
+
 import useDebounce from "../../../hooks/useDebounce";
 import { setQueries } from "../../../redux/slice/querySlice";
 import { saveTokenToStore } from "../../../utils/storage";
-import ScrollRefreshWrapper from "../../../components/wrapper/ScrollRefreshWrapper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Dimensions } from "react-native";
 import {
   getShipperForShipper,
+  getUnOrders,
   putChangeDelivering,
   putFailDelivery,
   putReceiveChangeDelivering,
   putReturned,
+  putUnOrderApproved,
 } from "../../../redux/slice/unorder/unorderSlice";
 import { getShippers } from "../../../redux/slice/managerShipper/orderSlice";
 
@@ -51,42 +45,36 @@ interface RouteParams {
   status: string;
 }
 
-const OrderAllShipper = () => {
+const UnOrderAllShipper = () => {
   const animatedValue = useRef(new Animated.Value(0)).current;
-
-  const handleScroll = (e: any) => {
-    const offsetY = e.nativeEvent.contentOffset.y;
-    animatedValue.setValue(offsetY);
-  };
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalReject, setShowModalReject] = useState(false);
-  const [showModalFailed, setShowModalFailed] = useState(false);
   const [showModalReload, setShowModalReload] = useState(false);
   const [methodSearch, setMethodSearch] = useState("");
   const router = useRoute();
   const { status } = router.params as RouteParams;
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const { orderAll } = useAppSelector((state) => state.order);
   const [searchValueName, setSearchValueName] = useState<string>("");
   const [searchValueProduct, setSearchValueProduct] = useState<string>("");
   const [searchValueAddress, setSearchValueAddress] = useState<string>("");
   const [searchValueIdShipping, setSearchValueIdShipping] =
     useState<string>("");
-  const [showModalChooseShipper, setShowModalChooseShipper] = useState(false);
-
   const [valueReject, setValueReject] = useState<string>("");
   const debounce = useDebounce({ value: searchValueName });
+  const [chooseShipper, setChooseShipper] = useState("");
+  const { shippers } = useAppSelector((state) => state.manageShipper);
+  const { shipperForShipper, unorderAll } = useAppSelector(
+    (state) => state.unorder,
+  );
+
   const styles = useMemo(() => {
     return createStyles();
   }, []);
-  const [chooseShipper, setChooseShipper] = useState("");
-  const { shipperForShipper } = useAppSelector((state) => state.unorder);
-
   const body = {
     shippingId: searchValueIdShipping || null,
     completeDateFrom: null,
@@ -104,8 +92,8 @@ const OrderAllShipper = () => {
 
   const _getData = async () => {
     await dispatch(
-      getOrders({
-        body: body,
+      getUnOrders({
+        // body: body,
         params: { pageNumber: currentPage, pageSize: 100 },
       }),
     );
@@ -126,10 +114,10 @@ const OrderAllShipper = () => {
     getData();
   }, [dispatch, status]);
 
-  const handleRequest = async (id: number) => {
+  const handleUpdateMistake = async (id: number, item: any) => {
     setShowModal(false);
     setShowModalReload(true);
-    const res = await dispatch(putOrderRequest({ orderId: id }));
+    const res = await dispatch(putUnOrderApproved({ orderId: id }));
     const data = res.payload;
     if (data?.data?.code === 200) {
       await _getData();
@@ -137,114 +125,22 @@ const OrderAllShipper = () => {
       Toast.show({ title: "Thành công", placement: "top" });
     } else {
       setShowModalReload(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-
-      return null;
-    }
-  };
-
-  const handleReceiced = async (id: number) => {
-    setShowModal(false);
-    setShowModalReload(true);
-    const res = await dispatch(putOrderReceive({ orderId: id }));
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-      return null;
-    }
-  };
-
-  const handleDelivery = async (id: number, item: any) => {
-    setShowModal(false);
-    setShowModalReload(true);
-    const res = await dispatch(putOrderDelivered({ orderId: id }));
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-      return null;
-    }
-  };
-
-  const handleReject = async (id: number) => {
-    setShowModalReject(false);
-    setShowModalReload(true);
-    const res = await dispatch(
-      putOrderReject({ orderId: id, reason: valueReject }),
-    );
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-      return null;
-    }
-  };
-
-  const handleChangeDelivering = async (id: number) => {
-    setShowModal(false);
-    setShowModalReload(true);
-    const res = await dispatch(
-      putChangeDelivering({ orderId: id, shipperId: chooseShipper }),
-    );
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      setShowModal(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      setShowModal(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-
-      return null;
-    }
-  };
-
-  const handleReceiveChangeDelivering = async (id: number) => {
-    setShowModalReject(false);
-    setShowModalReload(true);
-    const res = await dispatch(putReceiveChangeDelivering({ orderId: id }));
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      setShowModal(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      setShowModal(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
       return null;
     }
   };
 
   const handleReturned = async (id: number) => {
-    setShowModalReject(false);
+    setShowModal(false);
     setShowModalReload(true);
     const res = await dispatch(putReturned({ orderId: id }));
     const data = res.payload;
     if (data?.data?.code === 200) {
       await _getData();
       setShowModalReload(false);
-      setShowModal(false);
       Toast.show({ title: "Thành công", placement: "top" });
     } else {
       setShowModalReload(false);
-      setShowModal(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
       return null;
     }
@@ -292,65 +188,51 @@ const OrderAllShipper = () => {
     };
     getData();
   };
-  const handleDeliveryFailed = async (id: number) => {
-    setShowModal(false);
-    setShowModalReload(true);
-    const res = await dispatch(putFailDelivery({ orderId: id }));
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-      return null;
-    }
-  };
   const renderItem = ({ item }: { item: any }) => {
-    const displayButtonDelivered = item.orderStatus === 11;
+    const displayButtonDelivered = item.orderStatus === 22;
+
     return (
       <Box style={styles.listOrderItem}>
         <Box>
           <Text style={tw`font-medium `}>
-            Mã đơn hàng: <Text>{item?.shippingId}</Text>
+            Mã đơn hàng: <Text>{item?.orderId}</Text>
           </Text>
           <Text style={tw`font-medium`}>
-            Họ tên: <Text>{item?.nameReceiver}</Text>
+            Họ tên shipper: <Text>{item?.shipperName}</Text>
           </Text>
 
-          <Pressable
-            onPress={() => Linking.openURL(`tel:${item.phoneReceiver}`)}
+          {/* <Pressable
+            onPress={() => Linking.openURL(`tel:${item.}`)}
           >
             <Text style={tw`font-medium`}>
               Điện thoại: <Text>{item?.phoneReceiver}</Text>
             </Text>
-          </Pressable>
+          </Pressable> */}
 
-          <Text style={tw`font-medium`}>
+          {/* <Text style={tw`font-medium`}>
             Địa chỉ:
             <Text>{item.addressReceiver}</Text>
-          </Text>
+          </Text> */}
           <Text style={tw`font-medium`}>
             Ngày mua:
-            <Text>{item.buyDate.substring(0, 10)}</Text>
+            <Text>{item.createdTime.substring(0, 10)}</Text>
           </Text>
           <Text style={tw`font-medium text-red-500`}>
-            Tổng tiền:
-            <Text>{item.finalPrice}</Text>
+            Loại:
+            <Text>{item.orderStatusNameVn}</Text>
           </Text>
           <View style={tw` w-fit text-blue-500`}>
-            {item.paymentStatusString === "Payment success" ? (
+            {item.orderStatusName === "Return" ? (
               <Text
                 style={tw`text-blue-500 uppercase  text-md w-fit rounded-lg`}
               >
-                Đã thanh toán
+                Trả hàng
               </Text>
             ) : (
               <Text
                 style={tw`text-blue-500 uppercase  text-md w-fit rounded-lg`}
               >
-                Chưa thanh toán
+                Đổi hàng
               </Text>
             )}
           </View>
@@ -360,19 +242,17 @@ const OrderAllShipper = () => {
             style={{
               backgroundColor: colorPalletter.blue["500"],
               marginBottom: 10,
-              width: "100%",
             }}
             onPress={() =>
-              navigation.navigate("DetailOrder", { idOrder: item.id })
+              navigation.navigate("DetailOrder", { idOrder: item.orderId })
             }
           >
             <Text style={{ color: "white" }}>Chi tiết</Text>
           </Button>
-          <Button
+          {/* <Button
             style={{
               backgroundColor: colorPalletter.pink["500"],
               marginBottom: 10,
-              width: "100%",
             }}
             onPress={() => {
               saveTokenToStore("address", JSON.stringify(item.addressReceiver));
@@ -382,135 +262,33 @@ const OrderAllShipper = () => {
             }}
           >
             <Text style={{ color: "white" }}>Xem bản đồ</Text>
-          </Button>
+          </Button> */}
 
-          {item.orderStatus === 4 ? (
-            <View style={{ width: "100%" }}>
-              <Button
-                style={{
-                  backgroundColor: colorPalletter.lime["500"],
-                  marginBottom: 10,
-                  width: "100%",
-                }}
-                onPress={() => {
-                  setShowModal(true);
-                }}
-              >
-                <Text style={{ color: "white" }}>Nhận đơn</Text>
-              </Button>
-              <Button
-                style={{
-                  backgroundColor: colorPalletter.red["500"],
-                  marginBottom: 10,
-                  width: "100%",
-                }}
-                onPress={() => {
-                  setShowModalReject(true);
-                }}
-              >
-                <Text style={{ color: "white" }}>Từ chối</Text>
-              </Button>
-            </View>
-          ) : item.orderStatus === 5 ? (
-            <div>
-              <Button
-                style={{
-                  backgroundColor: colorPalletter.orange["500"],
-                  marginBottom: 10,
-                  width: "100%",
-                }}
-                onPress={() => {
-                  setShowModal(true);
-                }}
-              >
-                <Text style={{ color: "white" }}>Đã giao hàng</Text>
-              </Button>
-              <Button
-                style={{
-                  backgroundColor: colorPalletter.lime["500"],
-                  marginBottom: 10,
-                  width: "100%",
-                }}
-                onPress={() => {
-                  setShowModalChooseShipper(true);
-                }}
-              >
-                <Text style={{ color: "white" }}>
-                  Chuyển giao cho shipper khác
-                </Text>
-              </Button>
-
-              <Button
-                style={{
-                  backgroundColor: colorPalletter.red["500"],
-                  marginBottom: 10,
-                  width: "100%",
-                }}
-                onPress={() => {
-                  setShowModalFailed(true);
-                }}
-              >
-                <Text style={{ color: "white" }}>Giao hàng thất bại</Text>
-              </Button>
-            </div>
-          ) : item.orderStatus === 2 ? (
+          {item.orderStatus === 13 ? (
             <Button
               disabled={displayButtonDelivered}
               style={{
                 backgroundColor: colorPalletter.yellow["500"],
                 marginBottom: 10,
-                width: "100%",
               }}
               onPress={() => {
                 setShowModal(true);
               }}
             >
-              <Text style={{ color: "white" }}>Yêu cầu giao</Text>
+              <Text style={{ color: "white" }}>Đơn hàng đang đổi</Text>
             </Button>
-          ) : item.orderStatus === 8 || item.orderStatus === 9 ? (
-            <div>
-              <Button
-                disabled={displayButtonDelivered}
-                style={{
-                  backgroundColor: colorPalletter.yellow["500"],
-                  marginBottom: 10,
-                  width: "100%",
-                }}
-                onPress={() => {
-                  setShowModalFailed(true);
-                }}
-              >
-                <Text style={{ color: "white" }}>Giao thất bại</Text>
-              </Button>
-              <Button
-                disabled={displayButtonDelivered}
-                style={{
-                  backgroundColor: colorPalletter.yellow["500"],
-                  marginBottom: 10,
-                  width: "100%",
-                }}
-                onPress={() => {
-                  setShowModalFailed(true);
-                }}
-              >
-                <Text style={{ color: "white" }}>
-                  Đơn hàng trở lại vận chuyển
-                </Text>
-              </Button>
-            </div>
-          ) : item.orderStatus === 10 ? (
+          ) : item.orderStatus === 16 ? (
             <Button
               disabled={displayButtonDelivered}
               style={{
                 backgroundColor: colorPalletter.yellow["500"],
                 marginBottom: 10,
-                width: "100%",
               }}
               onPress={() => {
                 setShowModal(true);
               }}
             >
-              <Text style={{ color: "white" }}>Shipper trả lại đơn hàng</Text>
+              <Text style={{ color: "white" }}>Đơn hàng đang đổi và trả</Text>
             </Button>
           ) : item.orderStatus === 19 ? (
             <Button
@@ -518,63 +296,12 @@ const OrderAllShipper = () => {
               style={{
                 backgroundColor: colorPalletter.yellow["500"],
                 marginBottom: 10,
-                width: "100%",
               }}
               onPress={() => {
                 setShowModal(true);
               }}
             >
-              <Text style={{ color: "white" }}>
-                Đơn hàng trả lại thành công
-              </Text>
-            </Button>
-          ) : item.orderStatus === 20 ? (
-            <Button
-              disabled={displayButtonDelivered}
-              style={{
-                backgroundColor: colorPalletter.yellow["500"],
-                marginBottom: 10,
-                width: "100%",
-              }}
-              onPress={() => {
-                setShowModal(true);
-              }}
-            >
-              <Text style={{ color: "white" }}>
-                Chính thức giao hàng thất bại
-              </Text>
-            </Button>
-          ) : item.orderStatus === 6 ? (
-            <Button
-              disabled={displayButtonDelivered}
-              style={{
-                backgroundColor: colorPalletter.yellow["500"],
-                marginBottom: 10,
-                width: "100%",
-              }}
-              onPress={() => {
-                setShowModal(true);
-              }}
-            >
-              <Text style={{ color: "white" }}>
-                Đơn hàng được shipper khác nhận
-              </Text>
-            </Button>
-          ) : item.orderStatus === 7 ? (
-            <Button
-              disabled={displayButtonDelivered}
-              style={{
-                backgroundColor: colorPalletter.yellow["500"],
-                marginBottom: 10,
-                width: "100%",
-              }}
-              onPress={() => {
-                setShowModal(true);
-              }}
-            >
-              <Text style={{ color: "white" }}>
-                Đơn hàng trở lại vận chuyển
-              </Text>
+              <Text style={{ color: "white" }}>Đơn hàng đang trả</Text>
             </Button>
           ) : null}
         </Box>
@@ -595,204 +322,34 @@ const OrderAllShipper = () => {
                   <Text style={{ color: "white" }}>No</Text>
                 </Button>
                 <View>
-                  {item.orderStatus === 2 ? (
+                  {item.orderStatus === 13 ? (
                     <Button
                       onPress={() => {
-                        handleRequest(item.id);
+                        handleReturned(item.orderId);
                       }}
                     >
                       <Text style={{ color: "white" }}>Yes</Text>
                     </Button>
                   ) : null}
-                  {item.orderStatus === 4 ? (
+                  {item.orderStatus === 16 ? (
                     <Button
                       onPress={() => {
-                        handleReceiced(item.id);
+                        handleReturned(item.orderId);
                       }}
                     >
                       <Text style={{ color: "white" }}>Yes</Text>
                     </Button>
-                  ) : null}
-                  {item.orderStatus === 5 ? (
-                    <div>
-                      <Button
-                        onPress={() => {
-                          handleDelivery(item.id, item);
-                        }}
-                      >
-                        <Text style={{ color: "white" }}>Yes</Text>
-                      </Button>
-                    </div>
-                  ) : null}
-
-                  {item.orderStatus === 6 ? (
-                    <div>
-                      <Button
-                        onPress={() => {
-                          handleReceiveChangeDelivering(item.id);
-                        }}
-                      >
-                        <Text style={{ color: "white" }}>Yes</Text>
-                      </Button>
-                    </div>
-                  ) : null}
-
-                  {item.orderStatus === 7 ? (
-                    <div>
-                      <Button
-                        onPress={() => {
-                          handleReceiced(item.id);
-                        }}
-                      >
-                        <Text style={{ color: "white" }}>Yes</Text>
-                      </Button>
-                    </div>
                   ) : null}
                   {item.orderStatus === 19 ? (
-                    <div>
-                      <Button
-                        onPress={() => {
-                          handleReturned(item.id);
-                        }}
-                      >
-                        <Text style={{ color: "white" }}>Yes</Text>
-                      </Button>
-                    </div>
+                    <Button
+                      onPress={() => {
+                        handleReturned(item.orderId);
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>Yes</Text>
+                    </Button>
                   ) : null}
                 </View>
-              </Button.Group>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal>
-        <Modal
-          isOpen={showModalChooseShipper}
-          onClose={() => setShowModalChooseShipper(false)}
-        >
-          <Modal.Content maxWidth="400px" maxHeight={"400px"}>
-            <Modal.CloseButton />
-            <Modal.Header>
-              <Text>Chọn shipper giao hàng !</Text>
-            </Modal.Header>
-            <View width={"full"}>
-              <Select
-                background={"gray.500"}
-                selectedValue={chooseShipper}
-                minWidth="20"
-                height={"60"}
-                accessibilityLabel="Chọn Shipper"
-                placeholder="Chọn Shipper"
-                _selectedItem={{
-                  bg: "teal.600",
-                  endIcon: <CheckIcon size="5" />,
-                }}
-                mt={1}
-                onValueChange={(itemValue) => setChooseShipper(itemValue)}
-              >
-                {shipperForShipper.data.data.map((shipper) => (
-                  <Select.Item
-                    key={shipper.id}
-                    label={shipper.fullName}
-                    value={shipper.id.toString()}
-                  />
-                ))}
-              </Select>
-            </View>
-            <Modal.Footer>
-              <Button.Group space={2}>
-                <Button
-                  variant="ghost"
-                  colorScheme="blueGray"
-                  onPress={() => {
-                    setShowModalChooseShipper(false);
-                  }}
-                >
-                  <Text>No</Text>
-                </Button>
-                <Button
-                  onPress={() => {
-                    handleChangeDelivering(item.id);
-                  }}
-                >
-                  <Text>Yes</Text>
-                </Button>
-              </Button.Group>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal>
-
-        <Modal
-          isOpen={showModalFailed}
-          onClose={() => setShowModalFailed(false)}
-        >
-          <Modal.Content maxWidth="400px" maxHeight={"400px"}>
-            <Modal.CloseButton />
-            <Modal.Header>
-              <Text>Giao hàng thất bại</Text>
-            </Modal.Header>
-            <View width={"full"}></View>
-            <Modal.Footer>
-              <Button.Group space={2}>
-                <Button
-                  variant="ghost"
-                  colorScheme="blueGray"
-                  onPress={() => {
-                    setShowModalFailed(false);
-                  }}
-                >
-                  <Text>No</Text>
-                </Button>
-                <Button
-                  onPress={() => {
-                    handleDeliveryFailed(item.id);
-                  }}
-                >
-                  <Text>Yes</Text>
-                </Button>
-              </Button.Group>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal>
-
-        <Modal
-          isOpen={showModalReject}
-          onClose={() => setShowModalReject(false)}
-        >
-          <Modal.Content maxWidth={400}>
-            <Modal.CloseButton />
-            <Modal.Header>
-              <Text style={{ color: "" }}>Vui lòng nhập lý do từ chối !</Text>
-            </Modal.Header>
-            <Modal.Content maxWidth={400}>
-              <View height={"1/2"} width={"full"}>
-                <Input
-                  size="md"
-                  variant="unstyled"
-                  value={valueReject}
-                  onChangeText={handleValueReject}
-                  placeholder={"Lý do..."}
-                  style={styles.input}
-                />
-              </View>
-            </Modal.Content>
-            <Modal.Footer>
-              <Button.Group space={2}>
-                <Button
-                  style={styles.btnReject}
-                  variant="ghost"
-                  colorScheme="blueGray"
-                  onPress={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  <Text style={{ color: "" }}>No</Text>
-                </Button>
-                <Button
-                  onPress={() => {
-                    handleReject(item.id);
-                  }}
-                >
-                  <Text style={{ color: "" }}>Yes</Text>
-                </Button>
               </Button.Group>
             </Modal.Footer>
           </Modal.Content>
@@ -815,7 +372,7 @@ const OrderAllShipper = () => {
 
   return (
     <>
-      <Appbar title="Đặt hàng" />
+      <Appbar title="Đổi/trả hàng" />
       {isGettingData ? (
         <LoadingComponent />
       ) : (
@@ -977,7 +534,7 @@ const OrderAllShipper = () => {
                   style={{
                     backgroundColor: colorPalletter.blue["500"],
                     marginBottom: 10,
-                    width: "100%",
+                    width: 100, // Adjust width here
                     marginLeft: 10,
                   }}
                   onPress={() => {
@@ -993,10 +550,9 @@ const OrderAllShipper = () => {
 
                 {/* </SafeAreaView> */}
               </View>
-
               <FlatList
                 overflowY={"scroll"}
-                data={orderAll.data.data}
+                data={[...unorderAll.data.data.content].reverse()}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 // showsVerticalScrollIndicator={false}
@@ -1009,5 +565,5 @@ const OrderAllShipper = () => {
   );
 };
 
-export default OrderAllShipper;
+export default UnOrderAllShipper;
 

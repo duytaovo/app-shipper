@@ -12,12 +12,16 @@ import {
   configureStore,
 } from "@reduxjs/toolkit";
 import statisticReducer from "./slice/statistic/statisticSlice";
+import unorderReducer from "./slice/unorder/unorderSlice";
+import mangeUnOrderReducer from "./slice/manager/unOrder/returnChangeSlice";
 export const store = configureStore({
   reducer: {
     dialog: dialogReducer,
     query: queryReducer,
     user: userReducer,
     order: orderReducer,
+    unorder: unorderReducer,
+    mangeUnOrderReducer:mangeUnOrderReducer,
     orderManager: orderManagerReducer,
     manageShipper: manageShipperReducer,
     chatShipper: chatReducer,

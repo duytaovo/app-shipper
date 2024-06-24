@@ -49,14 +49,36 @@ const PersonalScreen: React.FC = () => {
     },
   });
 
-  useEffect(() => {
-    const _getData = async () => {
+  const fetchData = async () => {
+    try {
       const res = await dispatch(getUser(""));
-      await unwrapResult(res);
-      await dispatch(getUserById(res?.payload?.data.data.id));
-    };
-    _getData();
-  }, []);
+      const result = unwrapResult(res);
+      await dispatch(getUserById(result?.data?.id));
+    } catch (error) {
+      console.error("Failed to fetch data", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [dispatch]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+
+      const onBackPress = () => {
+        return true;
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      };
+    }, []),
+  );
+
   useEffect(() => {
     setValue("fullName", profile.fullName);
     setValue("phoneNumber", profile.phoneNumber);
@@ -85,7 +107,7 @@ const PersonalScreen: React.FC = () => {
       if (d?.code !== 200) return;
       await dispatch(getUserById(profile.id));
       toast.show({
-        title: "Update success",
+        title: "Cập nhật thành công",
         placement: "top",
       });
       navigation.navigate("MainboardShipper");
@@ -121,7 +143,7 @@ const PersonalScreen: React.FC = () => {
     <FontWrapper>
       <View style={{ paddingBottom: 20 }}>
         <AppBar title="Profile" />
-       
+
         <Center>
           <Avatar
             mt={2}
@@ -132,7 +154,7 @@ const PersonalScreen: React.FC = () => {
               uri: "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80",
             }}
           />
-          <Text style={{ color: COLORS.primary }}>My name</Text>
+          {/* <Text style={{ color: COLORS.primary }}>{profile?.fullName}</Text> */}
         </Center>
       </View>
       {profile.isEnable ? (
