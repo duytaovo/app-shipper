@@ -17,42 +17,37 @@ import {
 } from "native-base";
 import { Animated, Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { colorPalletter } from "../../../assets/theme/color";
-import LoadingComponent from "../../../components/Loading";
-import EmptyListOrder from "../../../components/shared/EmptyListOrder";
-import Appbar from "../../../components/shared/Appbar";
+import { colorPalletter } from "../../../../assets/theme/color";
+import LoadingComponent from "../../../../components/Loading";
+import EmptyListOrder from "../../../../components/shared/EmptyListOrder";
+import Appbar from "../../../../components/shared/Appbar";
 import { createStyles } from "./style";
-import { useAppDispatch, useAppSelector } from "../../../hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/useRedux";
 import { MaterialIcons } from "@expo/vector-icons";
 import tw from "twrnc";
 
-import useDebounce from "../../../hooks/useDebounce";
-import { setQueries } from "../../../redux/slice/querySlice";
-import { saveTokenToStore } from "../../../utils/storage";
+import useDebounce from "../../../../hooks/useDebounce";
+import { setQueries } from "../../../../redux/slice/querySlice";
+import { saveTokenToStore } from "../../../../utils/storage";
 import { Dimensions } from "react-native";
+
+import { getShippers } from "../../../../redux/slice/managerShipper/orderSlice";
+import { getOrders } from "../../../../redux/slice/order/orderSlice";
 import {
-  getShipperForShipper,
   getUnOrders,
-  putChangeDelivering,
-  putFailDelivery,
-  putReceiveChangeDelivering,
-  putReturneChangeToCustom,
-  putReturned,
-  putUnOrderApproved,
-} from "../../../redux/slice/unorder/unorderSlice";
-import { getShippers } from "../../../redux/slice/managerShipper/orderSlice";
-import { getOrders } from "../../../redux/slice/order/orderSlice";
+  putUnOrderApprove,
+} from "../../../../redux/slice/manager/unOrder/returnChangeSlice";
 
 interface RouteParams {
   status: string;
 }
 
-const UnOrderAllShipper = () => {
+const UnOrderAllManager = () => {
+  console.log("tttttttttttttt");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
-  const [showModalReject, setShowModalReject] = useState(false);
   const [showModalReload, setShowModalReload] = useState(false);
   const [methodSearch, setMethodSearch] = useState("");
   const router = useRoute();
@@ -66,7 +61,10 @@ const UnOrderAllShipper = () => {
     useState<string>("");
   const [valueReject, setValueReject] = useState<string>("");
   const debounce = useDebounce({ value: searchValueName });
-  const { orderAll } = useAppSelector((state) => state.order);
+  const { unOrder } = useAppSelector((state) => state.mangeUnOrderReducer);
+  const { shippers } = useAppSelector((state) => state.manageShipper);
+  const [chooseShipper, setChooseShipper] = useState("");
+  const [showModalChooseShipper, setShowModalChooseShipper] = useState(false);
 
   const styles = useMemo(() => {
     return createStyles();
@@ -88,13 +86,13 @@ const UnOrderAllShipper = () => {
 
   const _getData = async () => {
     await dispatch(
-      getOrders({
-        body: body,
+      getUnOrders({
+        // body: body,
         params: { pageNumber: currentPage, pageSize: 100 },
       }),
     );
     await dispatch(
-      getShipperForShipper({
+      getShippers({
         params: { pageNumber: currentPage, pageSize: 100 },
       }),
     );
@@ -110,10 +108,10 @@ const UnOrderAllShipper = () => {
     getData();
   }, [dispatch, status]);
 
-  const handleUpdateMistake = async (id: number, item: any) => {
+  const handleApprove = async (id: number) => {
     setShowModal(false);
     setShowModalReload(true);
-    const res = await dispatch(putUnOrderApproved({ orderId: id }));
+    const res = await dispatch(putUnOrderApprove({ orderId: id }));
     const data = res.payload;
     if (data?.data?.code === 200) {
       await _getData();
@@ -126,37 +124,6 @@ const UnOrderAllShipper = () => {
     }
   };
 
-  const handleReturned = async (id: number) => {
-    setShowModal(false);
-    setShowModalReload(true);
-    const res = await dispatch(putReturned({ orderId: id }));
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-      return null;
-    }
-  };
-
-  const handleReturnChangeToCustom = async (id: number) => {
-    setShowModal(false);
-    setShowModalReload(true);
-    const res = await dispatch(putReturneChangeToCustom({ orderId: id }));
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-      return null;
-    }
-  };
   const handleValueReject = (text: string) => {
     if (!text.startsWith(" ")) {
       setValueReject(text);
@@ -201,50 +168,53 @@ const UnOrderAllShipper = () => {
     getData();
   };
   const renderItem = ({ item }: { item: any }) => {
-    const displayButtonDelivered = item.orderStatus === 22;
+    console.log(item);
 
     return (
       <Box style={styles.listOrderItem}>
         <Box>
           <Text style={tw`font-medium `}>
-            Mã đơn hàng: <Text>{item?.shippingId}</Text>
+            Mã đơn hàng: <Text>{item?.ubOrderId}</Text>
           </Text>
           <Text style={tw`font-medium`}>
-            Họ tên: <Text>{item?.nameReceiver}</Text>
+            Số lượng: <Text>{item?.quantity}</Text>
+          </Text>
+          <Text style={tw`font-medium`}>
+            Lý do: <Text>{item?.mainCauseString}</Text>
           </Text>
 
-          <Pressable
+          {/* <Pressable
             onPress={() => Linking.openURL(`tel:${item.phoneReceiver}`)}
           >
             <Text style={tw`font-medium`}>
-              Điện thoại: <Text>{item?.phoneReceiver}</Text>
+              : <Text>{item?.phoneReceiver}</Text>
             </Text>
-          </Pressable>
+          </Pressable> */}
 
-          <Text style={tw`font-medium`}>
+          {/* <Text style={tw`font-medium`}>
             Địa chỉ:
             <Text>{item.addressReceiver}</Text>
-          </Text>
+          </Text> */}
           <Text style={tw`font-medium`}>
-            Ngày mua:
-            <Text>{item.buyDate.substring(0, 10)}</Text>
+            Ngày tạo yêu cầu:
+            <Text>{item.createdTime.substring(0, 10)}</Text>
           </Text>
-          <Text style={tw`font-medium text-red-500`}>
+          {/* <Text style={tw`font-medium text-red-500`}>
             Tổng tiền:
             <Text>{item.finalPrice}</Text>
-          </Text>
+          </Text> */}
           <View style={tw` w-fit text-blue-500`}>
-            {item.paymentStatusString === "Payment success" ? (
+            {item.typeString === "Return" ? (
               <Text
                 style={tw`text-blue-500 uppercase  text-md w-fit rounded-lg`}
               >
-                Đã thanh toán
+                Yêu cầu trả hàng
               </Text>
             ) : (
               <Text
                 style={tw`text-blue-500 uppercase  text-md w-fit rounded-lg`}
               >
-                Chưa thanh toán
+                Yêu cầu đổi hàng
               </Text>
             )}
           </View>
@@ -276,7 +246,9 @@ const UnOrderAllShipper = () => {
             <Text style={{ color: "white" }}>Xem bản đồ</Text>
           </Button> */}
 
-          {item.orderStatus === 13 ? (
+          {item.orderStatus === 12 ||
+          item.orderStatus === 15 ||
+          item.orderStatus === 18 ? (
             <Button
               style={{
                 backgroundColor: colorPalletter.yellow["500"],
@@ -286,31 +258,7 @@ const UnOrderAllShipper = () => {
                 setShowModal(true);
               }}
             >
-              <Text style={{ color: "white" }}>Đơn hàng đang đổi</Text>
-            </Button>
-          ) : item.orderStatus === 16 ? (
-            <Button
-              style={{
-                backgroundColor: colorPalletter.yellow["500"],
-                marginBottom: 10,
-              }}
-              onPress={() => {
-                setShowModal(true);
-              }}
-            >
-              <Text style={{ color: "white" }}>Đơn hàng đang đổi và trả</Text>
-            </Button>
-          ) : item.orderStatus === 19 ? (
-            <Button
-              style={{
-                backgroundColor: colorPalletter.yellow["500"],
-                marginBottom: 10,
-              }}
-              onPress={() => {
-                setShowModal(true);
-              }}
-            >
-              <Text style={{ color: "white" }}>Đơn hàng đang trả</Text>
+              <Text style={{ color: "white" }}>Chấp nhận yêu cầu</Text>
             </Button>
           ) : null}
         </Box>
@@ -331,28 +279,12 @@ const UnOrderAllShipper = () => {
                   <Text style={{ color: "white" }}>No</Text>
                 </Button>
                 <View>
-                  {item.orderStatus === 13 ? (
+                  {item.orderStatus === 12 ||
+                  item.orderStatus === 15 ||
+                  item.orderStatus === 18 ? (
                     <Button
                       onPress={() => {
-                        handleReturnChangeToCustom(item.id);
-                      }}
-                    >
-                      <Text style={{ color: "white" }}>Yes</Text>
-                    </Button>
-                  ) : null}
-                  {item.orderStatus === 16 ? (
-                    <Button
-                      onPress={() => {
-                        handleReturnChangeToCustom(item.id);
-                      }}
-                    >
-                      <Text style={{ color: "white" }}>Yes</Text>
-                    </Button>
-                  ) : null}
-                  {item.orderStatus === 19 ? (
-                    <Button
-                      onPress={() => {
-                        handleReturned(item.id);
+                        setShowModalChooseShipper(true);
                       }}
                     >
                       <Text style={{ color: "white" }}>Yes</Text>
@@ -373,6 +305,61 @@ const UnOrderAllShipper = () => {
               {/* <LoadingComponent /> */}
               <Text>Đang xử lý ...</Text>
             </View>
+          </Modal.Content>
+        </Modal>
+        <Modal
+          isOpen={showModalChooseShipper}
+          onClose={() => setShowModalChooseShipper(false)}
+        >
+          <Modal.Content maxWidth="400px" maxHeight={"400px"}>
+            <Modal.CloseButton />
+            <Modal.Header>
+              <Text>Chọn shipper giao hàng !</Text>
+            </Modal.Header>
+            <View width={"full"}>
+              <Select
+                background={"gray.500"}
+                selectedValue={chooseShipper}
+                minWidth="20"
+                height={"60"}
+                accessibilityLabel="Chọn Shipper"
+                placeholder="Chọn Shipper"
+                _selectedItem={{
+                  bg: "teal.600",
+                  endIcon: <CheckIcon size="5" />,
+                }}
+                mt={1}
+                onValueChange={(itemValue) => setChooseShipper(itemValue)}
+              >
+                {shippers.data.data.map((shipper) => (
+                  <Select.Item
+                    key={shipper.id}
+                    label={shipper.fullName}
+                    value={shipper.id.toString()}
+                  />
+                ))}
+              </Select>
+            </View>
+            <Modal.Footer>
+              <Button.Group space={2}>
+                <Button
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={() => {
+                    setShowModalChooseShipper(false);
+                  }}
+                >
+                  <Text>No</Text>
+                </Button>
+                <Button
+                  onPress={() => {
+                    handleApprove(item.id);
+                  }}
+                >
+                  <Text>Yes</Text>
+                </Button>
+              </Button.Group>
+            </Modal.Footer>
           </Modal.Content>
         </Modal>
       </Box>
@@ -561,7 +548,7 @@ const UnOrderAllShipper = () => {
               </View>
               <FlatList
                 overflowY={"scroll"}
-                data={[...orderAll.data.data]}
+                data={[...unOrder?.data?.data?.content].reverse()}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 // showsVerticalScrollIndicator={false}
@@ -574,5 +561,5 @@ const UnOrderAllShipper = () => {
   );
 };
 
-export default UnOrderAllShipper;
+export default UnOrderAllManager;
 

@@ -10,6 +10,9 @@ export const unorderService = {
   putReturned({ orderId }: any) {
     return http.put(`${URL}/returned?orderId=${orderId}`);
   },
+  putReturnChangeToCustom({ orderId }: any) {
+    return http.put(`${URL}/change-return-to-customer?orderId=${orderId}`);
+  },
   putReceiveChangeDeliveri({ orderId }: any) {
     return http.put(`${URL}/receive-change-delivering?orderId=${orderId}`);
   },

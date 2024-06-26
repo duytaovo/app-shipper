@@ -1,6 +1,5 @@
 {
   "expo": {
-    "permissions": ["location"],
     "packagerOpts": {
       "hostType": "localhost",
       "lanType": "ip",

@@ -32,6 +32,10 @@ const Select: React.FC = () => {
     navigation.navigate("ProfileShipperManager");
   };
 
+  const handleNavigateToUnOrder = () => {
+    navigation.navigate("UnOrderAllManager", { status: 12 });
+  };
+
   return (
     <FontWrapper style={tw``}>
       <HStack space={3} justifyContent="center" mb={3}>
@@ -277,6 +281,49 @@ const Select: React.FC = () => {
               onPress={() => handleNavigateToProfileShipper()}
             />
             Quản lý thông tin shipper
+          </Box>
+          <Box
+            style={tw`w-1/2 mr-2`}
+            bg={{
+              linearGradient: {
+                colors: ["lightBlue.300", "violet.800"],
+                start: [0, 0],
+                end: [1, 0],
+              },
+            }}
+            p="12"
+            rounded="xl"
+            _text={{
+              fontSize: "md",
+              fontWeight: "medium",
+              color: "warmGray.50",
+              textAlign: "center",
+            }}
+          >
+            <IconButton
+              icon={<Icon as={MaterialCommunityIcons} name="offer" />}
+              borderRadius="full"
+              _icon={{
+                color: "orange.500",
+                size: "4xl",
+              }}
+              _hover={{
+                bg: "orange.600:alpha.20",
+              }}
+              _pressed={{
+                bg: "orange.600:alpha.20",
+                _icon: {
+                  name: "offer",
+                },
+                _ios: {
+                  _icon: {
+                    size: "2xl",
+                  },
+                },
+              }}
+              onPress={() => handleNavigateToUnOrder()}
+            />
+            Đơn yêu cầu trả/đổi
           </Box>
         </View>
       </HStack>

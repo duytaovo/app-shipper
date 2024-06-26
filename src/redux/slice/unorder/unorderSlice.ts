@@ -18,6 +18,11 @@ export const putReturned = createAsyncThunk(
   payloadCreator(unorderService.putReturned),
 );
 
+export const putReturneChangeToCustom = createAsyncThunk(
+  "unorders/putReturneChangeToCustom",
+  payloadCreator(unorderService.putReturnChangeToCustom),
+);
+
 export const putReceiveChangeDelivering = createAsyncThunk(
   "unorders/putReceiveChangeDeliveri",
   payloadCreator(unorderService.putReceiveChangeDeliveri),
@@ -47,8 +52,8 @@ interface Data {
     totalPages: number;
     totalElements: number;
     data: {
-      content: [],
-    },
+      content: [];
+    };
   };
 }
 

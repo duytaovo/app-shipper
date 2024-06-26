@@ -27,6 +27,7 @@ import TrackingOrder3 from "../screens/TrackingPosition/Page3";
 import StatisticScreenShipper from "../screens/manager/statisticScreenShipper";
 import PersonalShipperScreen from "../screens/manager/personalShipper";
 import UnOrderNavigator from "./UnOrderNavigator";
+import UnOrderNavigatorManager from "./UnOrderNavigatorManager";
 
 type RootStackParamList = {
   Main: any;
@@ -36,6 +37,7 @@ type RootStackParamList = {
   Messenger: undefined;
   OrderAllShipper: { status: number | string };
   UnOrderAllShipper: { status: number | string };
+  UnOrderAllManager: { status: number | string };
   OrderAllAdmin: { status: number | string };
   Search: undefined;
   SearchResult: undefined;
@@ -144,9 +146,14 @@ const Routes: React.FC = () => {
         component={OrderNavigator}
         options={{ headerShown: false }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name={"UnOrderAllShipper"}
         component={UnOrderNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={"UnOrderAllManager"}
+        component={UnOrderNavigatorManager}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -160,7 +167,7 @@ const Routes: React.FC = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-       options={{ headerShown: false }}
+        options={{ headerShown: false }}
         name={"ProfileShipperManager"}
         component={PersonalShipperScreen}
       />

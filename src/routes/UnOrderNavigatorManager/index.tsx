@@ -4,11 +4,11 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { colorPalletter } from "../../assets/theme/color";
 import { TABS } from "../../constants";
 import OrderAll from "../../screens/listOrderScreen/allOrder";
-import UnOrderAllShipper from "../../screens/listUnOrderScreen/unAllOrder";
+import UnOrderAllManager from "../../screens/manager/listUnOrderScreen/unAllOrder";
 
 const Tab = createMaterialBottomTabNavigator();
 
-const UnOrderNavigator: React.FC = () => {
+const UnOrderNavigatorManager: React.FC = () => {
   return (
     <Tab.Navigator
       initialRouteName={TABS.UnOrderAll}
@@ -17,20 +17,20 @@ const UnOrderNavigator: React.FC = () => {
       barStyle={{ backgroundColor: "white" }}
     >
       <Tab.Screen
-        name={TABS.waitForItTab}
-        initialParams={{ status: 13 }}
-        component={UnOrderAllShipper}
+        name={TABS.UnOrderAll}
+        initialParams={{ status: 12 }}
+        component={UnOrderAllManager}
         options={{
-          tabBarLabel: "Đơn đổi hàng",
+          tabBarLabel: "Tất cả",
           tabBarIcon: ({ color }) => (
             <Ionicons name="cube-outline" color={color} size={26} />
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name={TABS.OrderPending}
-        initialParams={{ status: 16 }}
-        component={UnOrderAllShipper}
+        initialParams={{ status: 15 }}
+        component={UnOrderAllManager}
         options={{
           tabBarLabel: "Đơn đổi và trả",
           tabBarIcon: ({ color }) => (
@@ -39,9 +39,9 @@ const UnOrderNavigator: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name={TABS.UnOrderAll}
-        initialParams={{ status: 19 }}
-        component={UnOrderAllShipper}
+        name={TABS.waitForItTab}
+        initialParams={{ status: 18 }}
+        component={UnOrderAllManager}
         options={{
           tabBarLabel: "Đơn trả hàng",
           tabBarIcon: ({ color }) => (
@@ -51,7 +51,7 @@ const UnOrderNavigator: React.FC = () => {
       />
       <Tab.Screen
         name={TABS.OrderProcess}
-        component={UnOrderAllShipper}
+        component={UnOrderAllManager}
         initialParams={{ status: 11 }}
         options={{
           tabBarLabel: "Đơn đã vận chuyển",
@@ -59,7 +59,7 @@ const UnOrderNavigator: React.FC = () => {
             <Ionicons name="rocket-outline" color={color} size={26} />
           ),
         }}
-      />
+      /> */}
 
       {/* <Tab.Screen
         initialParams={{ status: 11 }}
@@ -76,5 +76,5 @@ const UnOrderNavigator: React.FC = () => {
   );
 };
 
-export default UnOrderNavigator;
+export default UnOrderNavigatorManager;
 
