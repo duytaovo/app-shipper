@@ -13,13 +13,16 @@ export function createStyles() {
       marginLeft: WINDOW_WIDTH * 0.025,
       marginTop: 16,
       borderRadius: 20,
+      display: "flex",
     },
     parentBoxBackground: {
       width: WINDOW_WIDTH * 0.95,
       height: WINDOW_WIDTH * 0.5,
       borderRadius: 20,
+      display: "flex",
     },
     rowContainer: {
+      display: "flex",
       flex: 1,
       flexDirection: "row",
       alignItems: "center",

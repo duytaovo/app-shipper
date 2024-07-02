@@ -42,7 +42,7 @@ const StatisticScreenShipper: React.FC = () => {
     shipperId: Number(chooseShipper),
     completeDateFrom: null,
     completeDateTo: null,
-    orderStatus: [0, 4, 5, 7],
+    orderStatus: [0, -1, 4, 5, 22, 11],
     receiveDateFrom: format(dateStart, "yyyy-MM-dd") || null,
     receiveDateTo: format(dateEnd, "yyyy-MM-dd") || null,
     buyDateFrom: null,
@@ -89,10 +89,14 @@ const StatisticScreenShipper: React.FC = () => {
   const calculateStats = () => {
     // Tính tổng số đơn hàng đã giao thành công
     const totalSuccessfulOrders = dataOrders?.data?.data?.filter(
-      (order: any) => order.orderStatus === 7,
+      (order: any) => order.orderStatus === 22,
     );
     const totalRejectOrders = dataOrders?.data?.data?.filter(
       (order: any) => order.orderStatus === 0,
+    ).length;
+
+    const totalFailedOrders = dataOrders?.data?.data?.filter(
+      (order: any) => order.orderStatus === -1,
     ).length;
 
     // Tính tổng số tiền gửi lại cho cửa hàng
@@ -112,6 +116,7 @@ const StatisticScreenShipper: React.FC = () => {
       totalRefundToShop,
       totalShippingRevenue,
       totalRejectOrders,
+      totalFailedOrders,
     };
   };
 
@@ -120,6 +125,7 @@ const StatisticScreenShipper: React.FC = () => {
     totalRejectOrders,
     totalRefundToShop,
     totalShippingRevenue,
+    totalFailedOrders,
   } = calculateStats();
   return (
     <>
@@ -130,7 +136,6 @@ const StatisticScreenShipper: React.FC = () => {
           <Button
             height={10}
             width={40}
-            // disabled={displayButtonDelivered}
             style={{
               margin: 8,
               marginBottom: 0,
@@ -227,6 +232,23 @@ const StatisticScreenShipper: React.FC = () => {
               />
             </ImageBackground>
           </View>
+          <View style={styles.parentBox}>
+            <ImageBackground
+              source={require("../../../assets/images/home/a3.jpg")}
+              resizeMode="cover"
+              style={styles.rowContainer}
+              imageStyle={styles.parentBoxBackground}
+            >
+              <StatisticCardView
+                title={"Đơn giao thất bại"}
+                iconName="today"
+                value={totalFailedOrders?.toString()}
+                unit="đơn"
+                // navToPage={SCREENS_NAME.TRIP_INFO}
+              />
+            </ImageBackground>
+          </View>
+
           {/* <View
           style={{
             marginTop: 2,

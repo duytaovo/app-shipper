@@ -6,6 +6,8 @@ import {
   TextInput,
   Pressable,
   Image,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState, useLayoutEffect, useEffect, useRef } from "react";
 import { Feather } from "@expo/vector-icons";
@@ -19,19 +21,6 @@ import * as ImagePicker from "expo-image-picker";
 import { useAppDispatch, useAppSelector } from "../../../hooks/useRedux";
 import { getChatUserById, setChatByUser } from "../../../redux/slice/chat/chat";
 import { formatTimeChat } from "../../../utils/format-time";
-interface Message {
-  code: number;
-  message: string;
-  data: {
-    senderId: number;
-    senderName: string;
-    receiverId: number;
-    receiverName: string;
-    message: string;
-    date: string;
-    status: string;
-  };
-}
 
 const ChatMessagesManager: React.FC = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -54,6 +43,7 @@ const ChatMessagesManager: React.FC = () => {
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
   let { data } = useAppSelector((state) => state.chatShipper.chatByUser);
   const { profile } = useAppSelector((state) => state.user);
+
   const _getData = async () => {
     await dispatch(getChatUserById(recepientId));
   };
@@ -118,6 +108,7 @@ const ChatMessagesManager: React.FC = () => {
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
   };
+
   const pickImage = async () => {
     let result: any = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -130,6 +121,7 @@ const ChatMessagesManager: React.FC = () => {
       setSelectedImage(result?.assets[0]?.uri);
     }
   };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: receiverName,
@@ -184,113 +176,117 @@ const ChatMessagesManager: React.FC = () => {
     });
   }, [recepientData, selectedMessages]);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setShowEmojiSelector(false);
+      },
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F0F0F0" }}>
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={{ flexGrow: 1 }}
-        onContentSizeChange={handleContentSizeChange}
-      >
-        {[...data].reverse().map((item: any, index: number) => {
-          if (item?.message?.length > 0) {
-            // const isSelected = selectedMessages.includes(item._id);
-            return (
-              <Pressable
-                // onLongPress={() => handleSelectMessage(item)}
-                key={index}
-                style={[
-                  item?.senderId === profile.id
-                    ? {
-                        alignSelf: "flex-end",
-                        backgroundColor: "#DCF8C6",
-                        padding: 8,
-                        maxWidth: "60%",
-                        borderRadius: 7,
-                        margin: 10,
-                      }
-                    : {
-                        alignSelf: "flex-start",
-                        backgroundColor: "white",
-                        padding: 8,
-                        margin: 10,
-                        borderRadius: 7,
-                        maxWidth: "60%",
-                      },
-
-                  // isSelected && { width: "100%", backgroundColor: "#F0FFFF" },
-                ]}
-              >
-                <Text
-                  style={{
-                    fontSize: 13,
-                    // textAlign: isSelected ? "right" : "left",
-                  }}
+      <TouchableWithoutFeedback onPress={() => setShowEmojiSelector(false)}>
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={{ flexGrow: 1 }}
+          onContentSizeChange={handleContentSizeChange}
+        >
+          {[...data].reverse().map((item: any, index: number) => {
+            if (item?.message?.length > 0) {
+              return (
+                <Pressable
+                  key={index}
+                  style={[
+                    item?.senderId === profile.id
+                      ? {
+                          alignSelf: "flex-end",
+                          backgroundColor: "#DCF8C6",
+                          padding: 8,
+                          maxWidth: "60%",
+                          borderRadius: 7,
+                          margin: 10,
+                        }
+                      : {
+                          alignSelf: "flex-start",
+                          backgroundColor: "white",
+                          padding: 8,
+                          margin: 10,
+                          borderRadius: 7,
+                          maxWidth: "60%",
+                        },
+                  ]}
                 >
-                  {item?.message}
-                </Text>
-                <Text
-                  style={{
-                    textAlign: "right",
-                    fontSize: 9,
-                    color: "gray",
-                    marginTop: 5,
-                  }}
-                >
-                  {formatTimeChat(item.date)}
-                </Text>
-              </Pressable>
-            );
-          }
-          if (item?.attachmentUrl?.length > 5) {
-            const imageUrl = item.attachmentUrl;
-            const source = { uri: imageUrl };
-            return (
-              <Pressable
-                key={index}
-                style={[
-                  item?.senderId === profile.id
-                    ? {
-                        alignSelf: "flex-end",
-                        backgroundColor: "#DCF8C6",
-                        padding: 8,
-                        maxWidth: "60%",
-                        borderRadius: 7,
-                        margin: 10,
-                      }
-                    : {
-                        alignSelf: "flex-start",
-                        backgroundColor: "white",
-                        padding: 8,
-                        margin: 10,
-                        borderRadius: 7,
-                        maxWidth: "60%",
-                      },
-                ]}
-              >
-                <View>
-                  <Image
-                    source={source}
-                    style={{ width: 200, height: 200, borderRadius: 7 }}
-                  />
+                  <Text style={{ fontSize: 13 }}>{item?.message}</Text>
                   <Text
                     style={{
                       textAlign: "right",
                       fontSize: 9,
-                      position: "absolute",
-                      right: 10,
-                      bottom: 7,
-                      color: "white",
+                      color: "gray",
                       marginTop: 5,
                     }}
                   >
-                    {formatTimeChat(item?.date)}
+                    {formatTimeChat(item.date)}
                   </Text>
-                </View>
-              </Pressable>
-            );
-          }
-        })}
-      </ScrollView>
+                </Pressable>
+              );
+            }
+            if (item?.attachmentUrl?.length > 5) {
+              const imageUrl = item.attachmentUrl;
+              const source = { uri: imageUrl };
+              return (
+                <Pressable
+                  key={index}
+                  style={[
+                    item?.senderId === profile.id
+                      ? {
+                          alignSelf: "flex-end",
+                          backgroundColor: "#DCF8C6",
+                          padding: 8,
+                          maxWidth: "60%",
+                          borderRadius: 7,
+                          margin: 10,
+                        }
+                      : {
+                          alignSelf: "flex-start",
+                          backgroundColor: "white",
+                          padding: 8,
+                          margin: 10,
+                          borderRadius: 7,
+                          maxWidth: "60%",
+                        },
+                  ]}
+                >
+                  <View>
+                    <Image
+                      source={source}
+                      style={{ width: 200, height: 200, borderRadius: 7 }}
+                    />
+                    <Text
+                      style={{
+                        textAlign: "right",
+                        fontSize: 9,
+                        position: "absolute",
+                        right: 10,
+                        bottom: 7,
+                        color: "white",
+                        marginTop: 5,
+                      }}
+                    >
+                      {formatTimeChat(item?.date)}
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            }
+          })}
+        </ScrollView>
+      </TouchableWithoutFeedback>
 
       <View
         style={{
@@ -352,14 +348,24 @@ const ChatMessagesManager: React.FC = () => {
       </View>
 
       {showEmojiSelector && (
-        <EmojiSelector
-          onEmojiSelected={(emoji) => {
-            setUserData({ ...userData, message: emoji.toString() });
-            setMessage((prevMessage) => prevMessage + emoji);
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 250,
+            backgroundColor: "white",
           }}
-          columns={8}
-          // style={{ height: 250 }}
-        />
+        >
+          <EmojiSelector
+            onEmojiSelected={(emoji) => {
+              setUserData({ ...userData, message: emoji.toString() });
+              setMessage((prevMessage) => prevMessage + emoji);
+            }}
+            columns={8}
+          />
+        </View>
       )}
     </KeyboardAvoidingView>
   );
