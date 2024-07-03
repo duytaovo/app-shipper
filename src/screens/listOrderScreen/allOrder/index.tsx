@@ -50,7 +50,19 @@ import { getShippers } from "../../../redux/slice/managerShipper/orderSlice";
 interface RouteParams {
   status: string;
 }
-
+interface Shipper {
+  id: number;
+  fullName: string;
+  phoneNumber: string;
+  email: string;
+  gender: number;
+  address: string;
+  imageUrl: string;
+  level: number;
+  levelString: string;
+  isEnable: boolean;
+  areaSign: string;
+}
 const OrderAllShipper = () => {
   const animatedValue = useRef(new Animated.Value(0)).current;
 
@@ -86,7 +98,82 @@ const OrderAllShipper = () => {
   }, []);
   const [chooseShipper, setChooseShipper] = useState("");
   const { shipperForShipper } = useAppSelector((state) => state.unorder);
+  const [area, setArea] = useState("");
+  const [filteredShippers, setFilteredShippers] = useState<Shipper[]>([]);
+  const [orderCounts, setOrderCounts] = useState<Record<number, number>>({});
+  useEffect(() => {
+    const filterShippers = () => {
+      // Tách địa chỉ giao hàng thành các từ khóa
+      const keywords = area.split(/,?\s+/);
+      const matchingShippers = shipperForShipper.data.data.filter((shipper) =>
+        keywords.some((keyword) =>
+          shipper.areaSign.toLowerCase().includes(keyword.toLowerCase()),
+        ),
+      );
+      setFilteredShippers(matchingShippers);
+    };
 
+    filterShippers();
+  }, [shipperForShipper, area]);
+  // useEffect(() => {
+  //   const fetchOrderCounts = async () => {
+  //     const counts: Record<number, number> = {};
+
+  //     const fetchOrdersForShipper = async (shipperId: number) => {
+  //       try {
+  //         const response: any = await orderManagerService.getPurchases({
+  //           body: {
+  //             shippingId: null,
+  //             shipperId: shipperId,
+  //             completeDateFrom: null,
+  //             completeDateTo: null,
+  //             orderStatus: [0, -1, 4, 5, 22, 11],
+  //             receiveDateFrom: null,
+  //             receiveDateTo: null,
+  //             buyDateFrom: null,
+  //             buyDateTo: null,
+  //             deliveryDateFrom: null,
+  //             deliveryDateTo: null,
+  //             shipDateFrom: null,
+  //             shipDateTo: null,
+  //             paymentStatus: [],
+  //             productName: null,
+  //             customerName: null,
+  //             customerAddress: null,
+  //           },
+  //           params: { pageNumber: 0, pageSize: 100 },
+  //         });
+  //         return response.data.data?.totalElements;
+  //       } catch (error) {
+  //         console.error(
+  //           `Error fetching orders for shipper ${shipperId}:`,
+  //           error,
+  //         );
+  //         return 0;
+  //       }
+  //     };
+
+  //     const promises = filteredShippers.map(async (shipper) => {
+  //       const orderCount = await fetchOrdersForShipper(shipper.id);
+  //       counts[shipper.id] = orderCount;
+  //     });
+
+  //     await Promise.all(promises);
+  //     setOrderCounts(counts);
+  //   };
+
+  //   if (filteredShippers.length > 0) {
+  //     fetchOrderCounts();
+  //   }
+  // }, [filteredShippers]);
+
+  const sortedShippers = [...filteredShippers].sort(
+    (a, b) => (orderCounts[a.id] || 0) - (orderCounts[b.id] || 0),
+  );
+  const showModalChooShipper = (order: any) => {
+    setShowModalChooseShipper(true);
+    setArea(order.addressReceiver);
+  };
   const body = {
     shippingId: searchValueIdShipping || null,
     completeDateFrom: null,
@@ -425,20 +512,20 @@ const OrderAllShipper = () => {
               >
                 <Text style={{ color: "white" }}>Đã giao hàng</Text>
               </Button>
-              <Button
+              {/* <Button
                 style={{
                   backgroundColor: colorPalletter.lime["500"],
                   marginBottom: 10,
                   width: "100%",
                 }}
                 onPress={() => {
-                  setShowModalChooseShipper(true);
+                  showModalChooShipper(item);
                 }}
               >
                 <Text style={{ color: "white" }}>
                   Chuyển giao cho shipper khác
                 </Text>
-              </Button>
+              </Button> */}
 
               <Button
                 style={{
@@ -625,7 +712,7 @@ const OrderAllShipper = () => {
                     </div>
                   ) : null}
 
-                  {item.orderStatus === 6 ? (
+                  {/* {item.orderStatus === 6 ? (
                     <div>
                       <Button
                         onPress={() => {
@@ -635,7 +722,7 @@ const OrderAllShipper = () => {
                         <Text style={{ color: "white" }}>Yes</Text>
                       </Button>
                     </div>
-                  ) : null}
+                  ) : null} */}
 
                   {item.orderStatus === 7 ? (
                     <div>
@@ -688,7 +775,7 @@ const OrderAllShipper = () => {
                 mt={1}
                 onValueChange={(itemValue) => setChooseShipper(itemValue)}
               >
-                {shipperForShipper.data.data.map((shipper) => (
+                {filteredShippers?.map((shipper) => (
                   <Select.Item
                     key={shipper.id}
                     label={shipper.fullName}

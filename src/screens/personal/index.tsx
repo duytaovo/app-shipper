@@ -46,6 +46,7 @@ const PersonalScreen: React.FC = () => {
       imageUrl: "",
       isEnable: true,
       gender: 1,
+      areaSign: "",
     },
   });
 
@@ -86,6 +87,7 @@ const PersonalScreen: React.FC = () => {
     setValue("imageUrl", profile.imageUrl);
     setValue("email", profile.email);
     setValue("gender", profile.gender);
+    setValue("areaSign", profile.areaSign);
   }, [profile, setValue]);
   const onSubmit = async (data: any) => {
     const body = {
@@ -304,6 +306,31 @@ const PersonalScreen: React.FC = () => {
                   }
                   onChangeText={onChange}
                   value={value}
+                  size="sm"
+                  placeholder=""
+                  style={styles.input}
+                />
+              )}
+            />
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>Khu vực giao hàng</FormControl.Label>
+            <Controller
+              control={control}
+              name="areaSign"
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <Input
+                  InputLeftElement={
+                    <Icon
+                      as={<FontAwesome name="address-book-o" />}
+                      size={5}
+                      ml="2"
+                      color="muted.400"
+                    />
+                  }
+                  onChangeText={onChange}
+                  value={value}
+                  isDisabled={true}
                   size="sm"
                   placeholder=""
                   style={styles.input}

@@ -15,7 +15,6 @@ import {
   FlatList,
   ScrollView,
 } from "native-base";
-import { Animated, Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { colorPalletter } from "../../../../assets/theme/color";
 import LoadingComponent from "../../../../components/Loading";
@@ -28,11 +27,9 @@ import tw from "twrnc";
 
 import useDebounce from "../../../../hooks/useDebounce";
 import { setQueries } from "../../../../redux/slice/querySlice";
-import { saveTokenToStore } from "../../../../utils/storage";
 import { Dimensions } from "react-native";
 
 import { getShippers } from "../../../../redux/slice/managerShipper/orderSlice";
-import { getOrders } from "../../../../redux/slice/order/orderSlice";
 import {
   getUnOrders,
   putUnOrderApprove,
@@ -43,7 +40,6 @@ interface RouteParams {
 }
 
 const UnOrderAllManager = () => {
-  console.log("tttttttttttttt");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const [isEmptyListOrder, setIsEmptyListOrder] = useState<boolean>(false);
@@ -59,30 +55,16 @@ const UnOrderAllManager = () => {
   const [searchValueAddress, setSearchValueAddress] = useState<string>("");
   const [searchValueIdShipping, setSearchValueIdShipping] =
     useState<string>("");
-  const [valueReject, setValueReject] = useState<string>("");
+  // const [valueReject, setValueReject] = useState<string>("");
   const debounce = useDebounce({ value: searchValueName });
   const { unOrder } = useAppSelector((state) => state.mangeUnOrderReducer);
-  const { shippers } = useAppSelector((state) => state.manageShipper);
-  const [chooseShipper, setChooseShipper] = useState("");
+  // const { shippers } = useAppSelector((state) => state.manageShipper);
+  // const [chooseShipper, setChooseShipper] = useState("");
   const [showModalChooseShipper, setShowModalChooseShipper] = useState(false);
 
   const styles = useMemo(() => {
     return createStyles();
   }, []);
-  const body = {
-    shippingId: searchValueIdShipping || null,
-    completeDateFrom: null,
-    completeDateTo: null,
-    receiveDateFrom: null,
-    receiveDateTo: null,
-    orderStatus: [status],
-    buyDateFrom: null,
-    buyDateTo: null,
-    paymentStatus: [],
-    productName: searchValueProduct || null,
-    customerName: searchValueName || null,
-    customerAddress: searchValueAddress || null,
-  };
 
   const _getData = async () => {
     await dispatch(
@@ -108,10 +90,12 @@ const UnOrderAllManager = () => {
     getData();
   }, [dispatch, status]);
 
-  const handleApprove = async (id: number) => {
+  const handleApprove = async (order: any) => {
     setShowModal(false);
     setShowModalReload(true);
-    const res = await dispatch(putUnOrderApprove({ orderId: id }));
+    const res: any = await dispatch(
+      putUnOrderApprove({ id: order.orderId, shipperId: order.shipperId }),
+    );
     const data = res.payload;
     if (data?.data?.code === 200) {
       await _getData();
@@ -124,11 +108,6 @@ const UnOrderAllManager = () => {
     }
   };
 
-  const handleValueReject = (text: string) => {
-    if (!text.startsWith(" ")) {
-      setValueReject(text);
-    }
-  };
   const handleSearchValueIdShipping = (text: string) => {
     if (!text.startsWith(" ")) {
       setSearchValueIdShipping(text);
@@ -168,13 +147,11 @@ const UnOrderAllManager = () => {
     getData();
   };
   const renderItem = ({ item }: { item: any }) => {
-    console.log(item);
-
     return (
       <Box style={styles.listOrderItem}>
         <Box>
           <Text style={tw`font-medium `}>
-            Mã đơn hàng: <Text>{item?.ubOrderId}</Text>
+            Mã đơn hàng: <Text>{item?.orderId}</Text>
           </Text>
           <Text style={tw`font-medium`}>
             Số lượng: <Text>{item?.quantity}</Text>
@@ -195,7 +172,7 @@ const UnOrderAllManager = () => {
             Địa chỉ:
             <Text>{item.addressReceiver}</Text>
           </Text> */}
-          <Text style={tw`font-medium`}>
+          <Text style={tw`font-medium `}>
             Ngày tạo yêu cầu:
             <Text>{item.createdTime.substring(0, 10)}</Text>
           </Text>
@@ -284,7 +261,7 @@ const UnOrderAllManager = () => {
                   item.orderStatus === 18 ? (
                     <Button
                       onPress={() => {
-                        setShowModalChooseShipper(true);
+                        handleApprove(item);
                       }}
                     >
                       <Text style={{ color: "white" }}>Yes</Text>
@@ -313,7 +290,7 @@ const UnOrderAllManager = () => {
         >
           <Modal.Content maxWidth="400px" maxHeight={"400px"}>
             <Modal.CloseButton />
-            <Modal.Header>
+            {/* <Modal.Header>
               <Text>Chọn shipper giao hàng !</Text>
             </Modal.Header>
             <View width={"full"}>
@@ -339,7 +316,7 @@ const UnOrderAllManager = () => {
                   />
                 ))}
               </Select>
-            </View>
+            </View> */}
             <Modal.Footer>
               <Button.Group space={2}>
                 <Button
@@ -353,7 +330,7 @@ const UnOrderAllManager = () => {
                 </Button>
                 <Button
                   onPress={() => {
-                    handleApprove(item.id);
+                    handleApprove(item);
                   }}
                 >
                   <Text>Yes</Text>

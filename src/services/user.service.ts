@@ -8,7 +8,11 @@ interface BodyUpdatePassword {
 
 export const userService = {
   getUserById(id: number) {
-    return httpRequest.get(`/user/profile/${id}`);
+    if (id) {
+      return httpRequest.get(`/user/profile/${id}`);
+    } else {
+      return;
+    }
   },
 
   updateProfile({ id, body }: any) {

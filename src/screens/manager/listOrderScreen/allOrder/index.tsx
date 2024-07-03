@@ -37,11 +37,26 @@ import {
 import useDebounce from "../../../../hooks/useDebounce";
 import { setQueries } from "../../../../redux/slice/querySlice";
 import { getShippers } from "../../../../redux/slice/managerShipper/orderSlice";
+import { orderManagerService } from "../../../../services/manage-order.service";
+import { putChangeDelivering } from "../../../../redux/slice/unorder/unorderSlice";
 
 interface RouteParams {
   status: string;
 }
 
+interface Shipper {
+  id: number;
+  fullName: string;
+  phoneNumber: string;
+  email: string;
+  gender: number;
+  address: string;
+  imageUrl: string;
+  level: number;
+  levelString: string;
+  isEnable: boolean;
+  areaSign: string;
+}
 const OrderAllManager = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
@@ -69,6 +84,83 @@ const OrderAllManager = () => {
   const styles = useMemo(() => {
     return createStyles();
   }, []);
+  const [area, setArea] = useState("");
+  const [filteredShippers, setFilteredShippers] = useState<Shipper[]>([]);
+  const [orderCounts, setOrderCounts] = useState<Record<number, number>>({});
+  useEffect(() => {
+    const filterShippers = () => {
+      // Tách địa chỉ giao hàng thành các từ khóa
+      const keywords = area.split(/,?\s+/);
+      const matchingShippers = shippers.data.data.filter((shipper) =>
+        keywords.some((keyword) =>
+          shipper.areaSign.toLowerCase().includes(keyword.toLowerCase()),
+        ),
+      );
+      console.log(matchingShippers);
+      setFilteredShippers(matchingShippers);
+    };
+
+    filterShippers();
+  }, [shippers, area]);
+  useEffect(() => {
+    const fetchOrderCounts = async () => {
+      const counts: Record<number, number> = {};
+
+      const fetchOrdersForShipper = async (shipperId: number) => {
+        try {
+          const response: any = await orderManagerService.getPurchases({
+            body: {
+              shippingId: null,
+              shipperId: shipperId,
+              completeDateFrom: null,
+              completeDateTo: null,
+              orderStatus: [0, -1, 4, 5, 22, 11],
+              receiveDateFrom: null,
+              receiveDateTo: null,
+              buyDateFrom: null,
+              buyDateTo: null,
+              deliveryDateFrom: null,
+              deliveryDateTo: null,
+              shipDateFrom: null,
+              shipDateTo: null,
+              paymentStatus: [],
+              productName: null,
+              customerName: null,
+              customerAddress: null,
+            },
+            params: { pageNumber: 0, pageSize: 100 },
+          });
+          return response.data.data?.totalElements;
+        } catch (error) {
+          console.error(
+            `Error fetching orders for shipper ${shipperId}:`,
+            error,
+          );
+          return 0;
+        }
+      };
+
+      const promises = filteredShippers.map(async (shipper) => {
+        const orderCount = await fetchOrdersForShipper(shipper.id);
+        counts[shipper.id] = orderCount;
+      });
+
+      await Promise.all(promises);
+      setOrderCounts(counts);
+    };
+
+    if (filteredShippers.length > 0) {
+      fetchOrderCounts();
+    }
+  }, [filteredShippers]);
+
+  const sortedShippers = [...filteredShippers].sort(
+    (a, b) => (orderCounts[a.id] || 0) - (orderCounts[b.id] || 0),
+  );
+  const showModalChooShipper = (order: any) => {
+    setShowModalChooseShipper(true);
+    setArea(order.addressReceiver);
+  };
 
   const body = {
     shippingId: searchValueIdShipping || null,
@@ -316,13 +408,38 @@ const OrderAllManager = () => {
     }
   }, [debounce]);
 
+  const handleChangeDelivering = async (id: number) => {
+    setShowModal(false);
+    setShowModalReload(true);
+    const res = await dispatch(
+      putChangeDelivering({ orderId: id, shipperId: chooseShipper }),
+    );
+    const data = res.payload;
+    if (data?.data?.code === 200) {
+      await dispatch(
+        getOrders({
+          body: body,
+          params: { pageNumber: currentPage, pageSize: 10 },
+        }),
+      );
+      setShowModalReload(false);
+      setShowModal(false);
+      Toast.show({ title: "Thành công", placement: "top" });
+    } else {
+      setShowModalReload(false);
+      setShowModal(false);
+      Toast.show({ title: "Có lỗi !!!", placement: "top" });
+
+      return null;
+    }
+  };
+
   const renderItem = ({ item }: { item: any }) => {
-    console.log(item);
     return (
       <Box style={styles.listOrderItem} key={item.id}>
         <Box>
           <Text style={tw`font-medium `}>
-            Mã đơn hàng: <Text>{item?.shippingId}</Text>
+            Mã đơn hàng: <Text>{item?.id}</Text>
           </Text>
           <Text style={tw`font-medium `}>
             Họ tên: <Text>{item?.nameReceiver}</Text>
@@ -554,7 +671,7 @@ const OrderAllManager = () => {
                 marginBottom: 10,
               }}
               onPress={() => {
-                setShowModalChooseShipper(true);
+                showModalChooShipper(item);
               }}
             >
               <Text>Gán cho shipper</Text>
@@ -562,16 +679,18 @@ const OrderAllManager = () => {
           ) : item.orderStatus === 5 ? (
             <View>
               <Button
-                disabled={true}
                 style={{
-                  backgroundColor: colorPalletter.gray["500"],
+                  backgroundColor: colorPalletter.lime["500"],
                   marginBottom: 10,
+                  width: "100%",
                 }}
                 onPress={() => {
-                  setShowModal(true);
+                  showModalChooShipper(item);
                 }}
               >
-                <Text>Đang giao hàng</Text>
+                <Text style={{ color: "white" }}>
+                  Chuyển giao cho shipper khác
+                </Text>
               </Button>
               <Button
                 style={{
@@ -794,7 +913,7 @@ const OrderAllManager = () => {
                 mt={1}
                 onValueChange={(itemValue) => setChooseShipper(itemValue)}
               >
-                {shippers.data.data.map((shipper) => (
+                {sortedShippers?.map((shipper) => (
                   <Select.Item
                     key={shipper.id}
                     label={shipper.fullName}
@@ -814,13 +933,23 @@ const OrderAllManager = () => {
                 >
                   <Text>No</Text>
                 </Button>
-                <Button
-                  onPress={() => {
-                    handleAsign(item.id);
-                  }}
-                >
-                  <Text>Yes</Text>
-                </Button>
+                {item.orderStatus === 2 ? (
+                  <Button
+                    onPress={() => {
+                      handleAsign(item.id);
+                    }}
+                  >
+                    <Text>Yes</Text>
+                  </Button>
+                ) : (
+                  <Button
+                    onPress={() => {
+                      handleChangeDelivering(item.id);
+                    }}
+                  >
+                    <Text>Yes</Text>
+                  </Button>
+                )}
               </Button.Group>
             </Modal.Footer>
           </Modal.Content>

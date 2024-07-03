@@ -45,6 +45,7 @@ const RegisterScreen = () => {
       phone: "",
       address: "",
       password: "",
+      area: "",
     },
   });
 
@@ -52,18 +53,20 @@ const RegisterScreen = () => {
     const body = {
       fullName: data.fullName,
       password: data.password,
-      phoneNumber: data.phone || "0352811529",
-      email: data.email || "shipper@gmail.com",
+      phoneNumber: data.phone,
+      email: data.email,
       gender: null,
-      address: data.address || "TPHCM",
+      address: data.address,
       imageUrl: null,
+      areaSign: data.area,
     };
     try {
       await setIsSubmitting(true);
       const res = await dispatch(registerUser(body));
       // unwrapResult(res);
       const d = res?.payload.data;
-      if (d == undefined) return toast.error("Email hoặc số điện thoại đã đăng ký .");
+      if (d == undefined)
+        return toast.error("Email hoặc số điện thoại đã đăng ký .");
       toast.show({
         title: "Thành công",
         placement: "top",
@@ -248,6 +251,30 @@ const RegisterScreen = () => {
               )}
             />
           </FormControl>
+          <FormControl>
+            <FormControl.Label>Khu vực giao hàng</FormControl.Label>
+            <Controller
+              control={control}
+              name="area"
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <Input
+                  InputLeftElement={
+                    <Icon
+                      as={<FontAwesome name="address-book-o" />}
+                      size={5}
+                      ml="2"
+                      color="muted.400"
+                    />
+                  }
+                  onChangeText={onChange}
+                  value={value}
+                  size="sm"
+                  placeholder=""
+                  style={styles.input}
+                />
+              )}
+            />
+          </FormControl>
         </FormControl>
 
         <Button
@@ -259,7 +286,6 @@ const RegisterScreen = () => {
         >
           Đăng ký
         </Button>
-       
       </VStack>
 
       <Button style={tw`mt-4`} onPress={() => navigation.navigate("Home")}>
