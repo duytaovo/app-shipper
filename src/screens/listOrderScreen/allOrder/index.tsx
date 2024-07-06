@@ -35,12 +35,9 @@ import {
 import useDebounce from "../../../hooks/useDebounce";
 import { setQueries } from "../../../redux/slice/querySlice";
 import { saveTokenToStore } from "../../../utils/storage";
-import ScrollRefreshWrapper from "../../../components/wrapper/ScrollRefreshWrapper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Dimensions } from "react-native";
 import {
   getShipperForShipper,
-  putChangeDelivering,
   putFailDelivery,
   putReceiveChangeDelivering,
   putReturned,
@@ -276,27 +273,6 @@ const OrderAllShipper = () => {
     } else {
       setShowModalReload(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
-      return null;
-    }
-  };
-
-  const handleChangeDelivering = async (id: number) => {
-    setShowModal(false);
-    setShowModalReload(true);
-    const res = await dispatch(
-      putChangeDelivering({ orderId: id, shipperId: chooseShipper }),
-    );
-    const data = res.payload;
-    if (data?.data?.code === 200) {
-      await _getData();
-      setShowModalReload(false);
-      setShowModal(false);
-      Toast.show({ title: "Thành công", placement: "top" });
-    } else {
-      setShowModalReload(false);
-      setShowModal(false);
-      Toast.show({ title: "Có lỗi !!!", placement: "top" });
-
       return null;
     }
   };
@@ -712,7 +688,7 @@ const OrderAllShipper = () => {
                     </div>
                   ) : null}
 
-                  {/* {item.orderStatus === 6 ? (
+                  {item.orderStatus === 6 ? (
                     <div>
                       <Button
                         onPress={() => {
@@ -722,7 +698,7 @@ const OrderAllShipper = () => {
                         <Text style={{ color: "white" }}>Yes</Text>
                       </Button>
                     </div>
-                  ) : null} */}
+                  ) : null}
 
                   {item.orderStatus === 7 ? (
                     <div>
@@ -795,13 +771,13 @@ const OrderAllShipper = () => {
                 >
                   <Text>No</Text>
                 </Button>
-                <Button
+                {/* <Button
                   onPress={() => {
                     handleChangeDelivering(item.id);
                   }}
                 >
                   <Text>Yes</Text>
-                </Button>
+                </Button> */}
               </Button.Group>
             </Modal.Footer>
           </Modal.Content>

@@ -36,9 +36,8 @@ import {
 } from "../../../../redux/slice/manager/order/orderSlice";
 import useDebounce from "../../../../hooks/useDebounce";
 import { setQueries } from "../../../../redux/slice/querySlice";
-import { getShippers } from "../../../../redux/slice/managerShipper/orderSlice";
+import { getShippers, putChangeDelivering } from "../../../../redux/slice/managerShipper/orderSlice";
 import { orderManagerService } from "../../../../services/manage-order.service";
-import { putChangeDelivering } from "../../../../redux/slice/unorder/unorderSlice";
 
 interface RouteParams {
   status: string;

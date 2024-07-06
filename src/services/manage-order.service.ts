@@ -40,7 +40,5 @@ export const orderManagerService = {
   putOrderFailed(id: any) {
     return http.put(`${URL}/failed/${id}`);
   },
-  
-  
 };
 

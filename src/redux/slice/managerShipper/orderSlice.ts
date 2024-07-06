@@ -7,6 +7,11 @@ export const getShippers = createAsyncThunk(
   payloadCreator(shipperManagerService.getShippers),
 );
 
+export const putChangeDelivering = createAsyncThunk(
+  "manageShipper/putChangeDelivering",
+  payloadCreator(shipperManagerService.putChangeDelivering),
+);
+
 const initialState = {
   shippers: {
     code: 200,

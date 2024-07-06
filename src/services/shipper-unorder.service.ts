@@ -19,11 +19,7 @@ export const unorderService = {
   putFailDelivery({ orderId }: any) {
     return http.put(`${URL}/delivery-fail?orderId=${orderId}`);
   },
-  putChangeDelivering({ orderId, shipperId }: any) {
-    return http.put(
-      `${URL}/change-delivering?orderId=${orderId}&shipperId=${shipperId}`,
-    );
-  },
+
   getUnOrders({ body, params }: any) {
     return http.post<SuccessResponse<any[]>>(`${URL}/order/mistake`, body, {
       params,

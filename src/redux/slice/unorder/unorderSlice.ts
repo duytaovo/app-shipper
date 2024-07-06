@@ -33,11 +33,6 @@ export const putFailDelivery = createAsyncThunk(
   payloadCreator(unorderService.putFailDelivery),
 );
 
-export const putChangeDelivering = createAsyncThunk(
-  "unorders/putChangeDelivering",
-  payloadCreator(unorderService.putChangeDelivering),
-);
-
 export const getShipperForShipper = createAsyncThunk(
   "unorders/getShipperForShipper",
   payloadCreator(unorderService.getShipperForShiper),
