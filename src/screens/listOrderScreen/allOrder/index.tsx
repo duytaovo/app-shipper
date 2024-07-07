@@ -228,6 +228,7 @@ const OrderAllShipper = () => {
   };
 
   const handleReceiced = async (id: number) => {
+    console.log(id);
     setShowModal(false);
     setShowModalReload(true);
     const res = await dispatch(putOrderReceive({ orderId: id }));
@@ -376,7 +377,7 @@ const OrderAllShipper = () => {
       <Box style={styles.listOrderItem}>
         <Box>
           <Text style={tw`font-medium `}>
-            Mã đơn hàng: <Text>{item?.shippingId}</Text>
+            Mã đơn hàng: <Text>{item?.id}</Text>
           </Text>
           <Text style={tw`font-medium`}>
             Họ tên: <Text>{item?.nameReceiver}</Text>
@@ -475,7 +476,7 @@ const OrderAllShipper = () => {
               </Button>
             </View>
           ) : item.orderStatus === 5 ? (
-            <div>
+            <View>
               <Button
                 style={{
                   backgroundColor: colorPalletter.orange["500"],
@@ -515,7 +516,7 @@ const OrderAllShipper = () => {
               >
                 <Text style={{ color: "white" }}>Giao hàng thất bại</Text>
               </Button>
-            </div>
+            </View>
           ) : item.orderStatus === 2 ? (
             <Button
               disabled={displayButtonDelivered}
@@ -531,7 +532,7 @@ const OrderAllShipper = () => {
               <Text style={{ color: "white" }}>Yêu cầu giao</Text>
             </Button>
           ) : item.orderStatus === 8 || item.orderStatus === 9 ? (
-            <div>
+            <View>
               <Button
                 disabled={displayButtonDelivered}
                 style={{
@@ -560,7 +561,7 @@ const OrderAllShipper = () => {
                   Đơn hàng trở lại vận chuyển
                 </Text>
               </Button>
-            </div>
+            </View>
           ) : item.orderStatus === 10 ? (
             <Button
               disabled={displayButtonDelivered}
@@ -677,7 +678,7 @@ const OrderAllShipper = () => {
                     </Button>
                   ) : null}
                   {item.orderStatus === 5 ? (
-                    <div>
+                    <View>
                       <Button
                         onPress={() => {
                           handleDelivery(item.id, item);
@@ -685,11 +686,11 @@ const OrderAllShipper = () => {
                       >
                         <Text style={{ color: "white" }}>Yes</Text>
                       </Button>
-                    </div>
+                    </View>
                   ) : null}
 
                   {item.orderStatus === 6 ? (
-                    <div>
+                    <View>
                       <Button
                         onPress={() => {
                           handleReceiveChangeDelivering(item.id);
@@ -697,11 +698,11 @@ const OrderAllShipper = () => {
                       >
                         <Text style={{ color: "white" }}>Yes</Text>
                       </Button>
-                    </div>
+                    </View>
                   ) : null}
 
                   {item.orderStatus === 7 ? (
-                    <div>
+                    <View>
                       <Button
                         onPress={() => {
                           handleReceiced(item.id);
@@ -709,10 +710,10 @@ const OrderAllShipper = () => {
                       >
                         <Text style={{ color: "white" }}>Yes</Text>
                       </Button>
-                    </div>
+                    </View>
                   ) : null}
                   {item.orderStatus === 19 ? (
-                    <div>
+                    <View>
                       <Button
                         onPress={() => {
                           handleReturned(item.id);
@@ -720,7 +721,7 @@ const OrderAllShipper = () => {
                       >
                         <Text style={{ color: "white" }}>Yes</Text>
                       </Button>
-                    </div>
+                    </View>
                   ) : null}
                 </View>
               </Button.Group>

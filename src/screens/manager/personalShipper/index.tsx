@@ -37,6 +37,7 @@ interface IUser {
   address: string;
   imageUrl: string;
   isEnable?: boolean;
+  areaSign: string;
 }
 const PersonalShipperScreen: React.FC = () => {
   const [profile, setProfile] = useState<IUser>();
@@ -145,15 +146,19 @@ const PersonalShipperScreen: React.FC = () => {
           <FormControl>
             <FormControl.Label>
               Số điện thoại:
-              <Text style={{ color: COLORS.text }}>
-                {profile?.phoneNumber}
-              </Text>
+              <Text style={{ color: COLORS.text }}>{profile?.phoneNumber}</Text>
             </FormControl.Label>
           </FormControl>
           <FormControl>
             <FormControl.Label>
               Địa chỉ:
               <Text style={{ color: COLORS.text }}>{profile?.address}</Text>
+            </FormControl.Label>
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>
+              Khu vực giao:
+              <Text style={{ color: COLORS.text }}>{profile?.areaSign}</Text>
             </FormControl.Label>
           </FormControl>
         </FormControl>
