@@ -3,7 +3,7 @@ import { createStyles } from "./style";
 import { ScrollView, Text, ImageBackground } from "react-native";
 import { useAppDispatch } from "../../hooks/useRedux";
 import StatisticCardView from "../../components/shared/StatisticCardView";
-import { Button, View } from "native-base";
+import { Button, Toast, View } from "native-base";
 import { getOrders } from "../../redux/slice/order/orderSlice";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { colorPalletter } from "../../assets/theme/color";
@@ -16,12 +16,9 @@ const StatisticScreen: React.FC = () => {
   }, []);
   const [isGettingData, setIsGettingData] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const [dateStart, setDateStart] = useState(
-    new Date(),
-  );
+  const [dateStart, setDateStart] = useState(new Date());
   const [dateEnd, setDateEnd] = useState(new Date());
   const [dataOrders, setShowDataOrders] = useState<any>();
-
   const onChangeStart = (event: any, selectedDate: any) => {
     const currentDate = selectedDate || dateStart;
     setDateStart(currentDate);
@@ -36,7 +33,7 @@ const StatisticScreen: React.FC = () => {
     shippingId: null,
     completeDateFrom: null,
     completeDateTo: null,
-    orderStatus: [0, 4, 5, 7],
+    orderStatus: [0, -1, 4, 5, 22, 11],
     receiveDateFrom: format(dateStart, "yyyy-MM-dd") || null,
     receiveDateTo: format(dateEnd, "yyyy-MM-dd") || null,
     buyDateFrom: null,
@@ -72,40 +69,52 @@ const StatisticScreen: React.FC = () => {
   }, [dispatch]);
 
   const calculateStats = () => {
-    // Tính tổng số đơn hàng đã giao thành công
-    const totalSuccessfulOrders = dataOrders?.data?.data?.filter(
-      (order: any) => order.orderStatus === 7,
-    );
-    const totalRejectOrders = dataOrders?.data?.data?.filter(
-      (order: any) => order.orderStatus === 0,
-    ).length;
+    if (dateStart > dateEnd) {
+      Toast.show({
+        title: "Ngày bắt đầu không thể lớn hơn ngày kết thúc",
+        placement: "top",
+      });
+      return;
+    } else {
+      // Tính tổng số đơn hàng đã giao thành công
+      const totalSuccessfulOrders = dataOrders?.data?.data?.filter(
+        (order: any) => order.orderStatus === 22,
+      );
+      const totalRejectOrders = dataOrders?.data?.data?.filter(
+        (order: any) => order.orderStatus === 0,
+      ).length;
+      const totalFailedOrders = dataOrders?.data?.data?.filter(
+        (order: any) => order.orderStatus === -1,
+      ).length;
+      // Tính tổng số tiền gửi lại cho cửa hàng
+      const totalRefundToShop = totalSuccessfulOrders?.reduce(
+        (total: any, order: any) => total + order.orderPrice,
+        0,
+      );
 
-    // Tính tổng số tiền gửi lại cho cửa hàng
-    const totalRefundToShop = totalSuccessfulOrders?.reduce(
-      (total: any, order: any) => total + order.orderPrice,
-      0,
-    );
+      // Tính tổng doanh thu của shipper
+      const totalShippingRevenue = totalSuccessfulOrders?.reduce(
+        (total: any, order: any) => total + order.deliveryPrice,
+        0,
+      );
 
-    // Tính tổng doanh thu của shipper
-    const totalShippingRevenue = totalSuccessfulOrders?.reduce(
-      (total: any, order: any) => total + order.deliveryPrice,
-      0,
-    );
-
-    return {
-      totalSuccessfulOrders,
-      totalRefundToShop,
-      totalShippingRevenue,
-      totalRejectOrders,
-    };
+      return {
+        totalSuccessfulOrders,
+        totalRefundToShop,
+        totalShippingRevenue,
+        totalRejectOrders,
+        totalFailedOrders,
+      };
+    }
   };
 
-  const {
-    totalSuccessfulOrders,
-    totalRejectOrders,
-    totalRefundToShop,
-    totalShippingRevenue,
-  } = calculateStats();
+  const stats = calculateStats();
+  const totalSuccessfulOrders = stats?.totalSuccessfulOrders?.length || 0;
+  const totalRejectOrders = stats?.totalRejectOrders || 0;
+  const totalRefundToShop = stats?.totalRefundToShop || 0;
+  const totalShippingRevenue = stats?.totalShippingRevenue || 0;
+  const totalFailedOrders = stats?.totalFailedOrders || 0;
+
   return (
     <>
       {isGettingData ? (
@@ -165,6 +174,13 @@ const StatisticScreen: React.FC = () => {
                 value={totalRefundToShop?.toString()}
                 unit=""
               />
+              <StatisticCardView
+                title={"Đơn giao thất bại"}
+                iconName="today"
+                value={totalFailedOrders.toString()}
+                unit="đơn"
+                // navToPage={SCREENS_NAME.TRIP_INFO}
+              />
             </ImageBackground>
           </View>
           <View style={styles.parentBox}>
@@ -184,7 +200,7 @@ const StatisticScreen: React.FC = () => {
               <StatisticCardView
                 title={"Đơn đã giao"}
                 iconName="podium"
-                value={totalSuccessfulOrders?.length?.toString()}
+                value={totalSuccessfulOrders?.toString()}
                 unit="đơn"
                 // navToPage={SCREENS_NAME.SUCCESS_INFO}
               />

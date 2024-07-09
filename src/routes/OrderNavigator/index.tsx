@@ -20,7 +20,7 @@ const OrderNavigator: React.FC = () => {
         initialParams={{ status: 2 }}
         component={OrderAll}
         options={{
-          tabBarLabel: "Đã yêu cầu",
+          tabBarLabel: "Đã xác nhận",
           tabBarIcon: ({ color }) => (
             <Ionicons name="cube-outline" color={color} size={26} />
           ),
@@ -31,7 +31,7 @@ const OrderNavigator: React.FC = () => {
         initialParams={{ status: 3 }}
         component={OrderAll}
         options={{
-          tabBarLabel: "Đơn chấp nhận",
+          tabBarLabel: "Đơn đã yêu cầu",
           tabBarIcon: ({ color }) => (
             <Ionicons name="cube-outline" color={color} size={26} />
           ),

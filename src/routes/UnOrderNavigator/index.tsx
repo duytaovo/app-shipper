@@ -11,7 +11,7 @@ const Tab = createMaterialBottomTabNavigator();
 const UnOrderNavigator: React.FC = () => {
   return (
     <Tab.Navigator
-      initialRouteName={TABS.UnOrderAll}
+      initialRouteName={TABS.waitForItTab}
       activeColor={colorPalletter.lime[600]}
       inactiveColor={colorPalletter.gray[400]}
       barStyle={{ backgroundColor: "white" }}

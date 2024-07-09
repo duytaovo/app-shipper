@@ -363,9 +363,11 @@ const OrderAllShipper = () => {
     const data = res.payload;
     if (data?.data?.code === 200) {
       await _getData();
+      setShowModalFailed(false);
       setShowModalReload(false);
       Toast.show({ title: "Thành công", placement: "top" });
     } else {
+      setShowModalFailed(false);
       setShowModalReload(false);
       Toast.show({ title: "Có lỗi !!!", placement: "top" });
       return null;
