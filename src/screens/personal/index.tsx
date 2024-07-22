@@ -33,15 +33,16 @@ const PersonalScreen: React.FC = () => {
   const [show, setShow] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { profile, userWithId } = useAppSelector((state) => state.user);
+  console.log(profile);
   const navigation = useNavigation();
   const toast = useToast();
   const dispatch = useAppDispatch();
   const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
-      fullName: profile.fullName,
-      email: profile.email,
-      phoneNumber: profile.phoneNumber,
-      address: profile.address,
+      fullName: profile?.fullName,
+      email: profile?.email,
+      phoneNumber: profile?.phoneNumber,
+      address: profile?.address,
       password: "",
       imageUrl: "",
       isEnable: true,
@@ -54,7 +55,10 @@ const PersonalScreen: React.FC = () => {
     try {
       const res = await dispatch(getUser(""));
       const result = unwrapResult(res);
-      await dispatch(getUserById(result?.data?.id));
+      console.log(result?.data?.data?.id);
+      const reslut2 = await dispatch(getUserById(result?.data?.data?.id));
+      unwrapResult(reslut2);
+      console.log(reslut2);
     } catch (error) {
       console.error("Failed to fetch data", error);
     }
@@ -81,15 +85,16 @@ const PersonalScreen: React.FC = () => {
   );
 
   useEffect(() => {
-    setValue("fullName", profile.fullName);
-    setValue("phoneNumber", profile.phoneNumber);
-    setValue("address", profile.address);
-    setValue("imageUrl", profile.imageUrl);
-    setValue("email", profile.email);
-    setValue("gender", profile.gender);
-    setValue("areaSign", profile.areaSign);
+    setValue("fullName", profile?.fullName);
+    setValue("phoneNumber", profile?.phoneNumber);
+    setValue("address", profile?.address);
+    setValue("imageUrl", profile?.imageUrl);
+    setValue("email", profile?.email);
+    setValue("gender", profile?.gender);
+    setValue("areaSign", profile?.areaSign);
   }, [profile, setValue]);
   const onSubmit = async (data: any) => {
+    console.log(data);
     const body = {
       fullName: data.fullName,
       phoneNumber: data.phoneNumber,
@@ -97,17 +102,18 @@ const PersonalScreen: React.FC = () => {
       email: data.email,
       gender: Number(data.gender),
       address: data.address,
+      areaSign: data?.areaSign,
       imageUrl: null,
     };
     try {
       await setIsSubmitting(true);
-      const res = await dispatch(updateProfile({ id: profile.id, body })).then(
+      const res = await dispatch(updateProfile({ id: profile?.id, body })).then(
         unwrapResult,
       );
 
-      const d = res?.payload.data;
-      if (d?.code !== 200) return;
-      await dispatch(getUserById(profile.id));
+      // const d = res?.payload.data;
+      // if (d?.code !== 200) return;
+      await dispatch(getUserById(profile?.id));
       toast.show({
         title: "Cập nhật thành công",
         placement: "top",
@@ -159,7 +165,7 @@ const PersonalScreen: React.FC = () => {
           {/* <Text style={{ color: COLORS.primary }}>{profile?.fullName}</Text> */}
         </Center>
       </View>
-      {profile.isEnable ? (
+      {profile?.isEnable ? (
         <Link
           _text={{
             fontSize: "xs",
@@ -330,7 +336,7 @@ const PersonalScreen: React.FC = () => {
                   }
                   onChangeText={onChange}
                   value={value}
-                  isDisabled={true}
+                  // isDisabled={true}
                   size="sm"
                   placeholder=""
                   style={styles.input}

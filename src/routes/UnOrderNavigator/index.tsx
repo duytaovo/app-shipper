@@ -27,7 +27,7 @@ const UnOrderNavigator: React.FC = () => {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name={TABS.OrderPending}
         initialParams={{ status: 16 }}
         component={UnOrderAllShipper}
@@ -37,7 +37,7 @@ const UnOrderNavigator: React.FC = () => {
             <Ionicons name="cube-outline" color={color} size={26} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name={TABS.UnOrderAll}
         initialParams={{ status: 19 }}

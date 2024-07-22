@@ -6,19 +6,19 @@ import FontWrapper from "../../components/wrapper/FontWrapper";
 import getHomeScreen from "../../services/getHomeScreen";
 import Error from "../../components/Error/Error";
 import tw from "twrnc";
-import { Button, Image } from "native-base";
+import { Button } from "native-base";
 import SwiperSlide from "./components/SwiperSlide";
 import { SliderIProps } from "../../types/slider";
 
 const data: SliderIProps[] = [
   {
     id: "1",
-    image: require("../../../assets/images/home/a3.jpg"),
+    image: require("../../../assets/images/home/a5.jpg"),
     url: "",
   },
   {
     id: "2",
-    image: require("../../../assets/images/home/a4.jpg"),
+    image: require("../../../assets/images/home/a5.jpg"),
     url: "",
   },
   {
@@ -66,7 +66,7 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
       <Text
         style={tw` text-center flex inset-0 justify-center align-top m-8 pt-10 text-3xl font-bold`}
       >
-       Ứng dụng tốt nhất để vận chuyển và giao hàng 
+        Ứng dụng dùng để vận chuyển và giao hàng
       </Text>
       <Button style={tw`m-4 `} onPress={() => navigation.navigate("Login")}>
         Tiếp
